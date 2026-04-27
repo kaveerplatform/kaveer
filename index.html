@@ -611,8 +611,14 @@ function buildOtpGrid(gid,fn){
 function otpVal(gid){ var g=$(gid); if(!g)return ''; return Array.from(g.children).map(function(i){return i.value;}).join(''); }
 
 // ── Firestore CRUD helpers ────────────────────────────────────
-function fsCol(path){ return db.collection(path); }
-function fsDoc(path, id){ return db.collection(path).doc(id); }
+function fsCol(path){
+  if(!db) throw new Error('Firebase not configured. Go to Admin → Settings.');
+  return db.collection(path);
+}
+function fsDoc(path, id){
+  if(!db) throw new Error('Firebase not configured. Go to Admin → Settings.');
+  return db.collection(path).doc(id);
+}
 
 async function fsGet(col, id){
   try{ var d=await fsDoc(col,id).get(); return d.exists?d.data():null; }
@@ -725,6 +731,14 @@ async function saveSettings(data){
 
 // ── Send OTP email via Brevo ──────────────────────────────────
 var DEMO_EMAILS=['arjun@demo.com','priya@demo.com','rahul@demo.com','teacher@demo.com'];
+// ── Demo users (hardcoded — work without Firestore) ──────────
+var DEMO_USERS = [
+  {id:'S001',name:'Arjun Sharma',   email:'arjun@demo.com',   role:'student',av:'AS',wa:'9876543210',college:'IIT Delhi',branch:'CSE',objective:'GATE Preparation',roll_no:'22CS101',joined:'2025-01-10',interests:['Data Structures','Algorithms'],_locked:['name','email'],_teacherImported:false,firstLoginDone:true},
+  {id:'S002',name:'Priya Verma',    email:'priya@demo.com',   role:'student',av:'PV',wa:'9876543211',college:'IIT Delhi',branch:'CSE',objective:'GATE Preparation',roll_no:'22CS102',joined:'2025-01-12',interests:['AI/ML','Data Structures'],_locked:['name','email'],_teacherImported:false,firstLoginDone:true},
+  {id:'S003',name:'Rahul Singh',    email:'rahul@demo.com',   role:'student',av:'RS',wa:'',           college:'',          branch:'',   objective:'',               roll_no:'',       joined:'2025-01-15',interests:['GATE CSE'],             _locked:['name','email'],_teacherImported:false,firstLoginDone:false},
+  {id:'T001',name:'Dr. Vinod Kumar',email:'teacher@demo.com', role:'teacher',av:'VK',wa:'',           college:'',          branch:'',   objective:'',               roll_no:'',       joined:'2025-01-01',interests:[],                        _locked:['name','email'],_teacherImported:false,firstLoginDone:true},
+];
+
 
 async function sendEmailOTP(toEmail,otp,subject){
   if(DEMO_EMAILS.indexOf(toEmail)>=0) return;
@@ -823,8 +837,12 @@ async function handleFbAuthUser(fbUser){
   var pic=fbUser.photoURL||'';
   if(!email){ showErr('lerr','Could not get email from Google account.'); return; }
 
-  // Look up user in Firestore by email
-  var users=await fsQuery('users',[['email','==',email]]);
+  // Check demo users first, then Firestore
+  var users=DEMO_USERS.filter(function(u){return u.email===email;});
+  if(users.length===0&&db){
+    try{ users=await fsQuery('users',[['email','==',email]]); }
+    catch(e){ console.warn('Firestore lookup failed:',e); }
+  }
   if(users.length>0){
     var user=users[0];
     // Update google pic if new
@@ -854,8 +872,13 @@ async function sendOtp(){
   if(!validEmail(email)){ showErr('lerr','Enter a valid email address.'); return; }
   if(!rl('login_'+email)){ showErr('lerr','Too many attempts. Wait 5 minutes.'); return; }
   
-  // Look up user in Firestore
-  var users=await fsQuery('users',[['email','==',email]]);
+  // Check demo users first (work without Firestore)
+  var users=DEMO_USERS.filter(function(u){return u.email===email;});
+  // Then check Firestore if available
+  if(users.length===0&&db){
+    try{ users=await fsQuery('users',[['email','==',email]]); }
+    catch(e){ console.warn('Firestore lookup failed:', e); }
+  }
   if(users.length===0){ showErr('lerr','No account found with this email. Please register first.'); return; }
   
   var code=genOtp(); storeOtp(email,code); ST.loginEmail=email;
@@ -882,7 +905,11 @@ async function verOtp(){
   if(res==='expired'){ showErr('lerr','OTP expired. Go back and request a new one.'); return; }
   if(res==='wrong'){ showErr('lerr','Incorrect OTP. Try again.'); return; }
   
-  var users=await fsQuery('users',[['email','==',ST.loginEmail]]);
+  var users=DEMO_USERS.filter(function(u){return u.email===ST.loginEmail;});
+  if(users.length===0&&db){
+    try{ users=await fsQuery('users',[['email','==',ST.loginEmail]]); }
+    catch(e){}
+  }
   if(users.length===0){ showErr('lerr','User not found.'); return; }
   finishLogin(users[0]);
 }
@@ -892,11 +919,13 @@ function finishLogin(user){
   $('l-s1').style.display='block'; $('l-s2').style.display='none';
   var em=$('l-email'); if(em) em.value='';
   hideErr('lerr');
-  // Start real-time listeners
-  listenSettings();
-  listenVideos();
-  listenProgress(user.id);
-  if(user.role==='teacher'||user.role==='admin') listenUsers();
+  // Start real-time listeners only if Firebase configured
+  if(db){
+    listenSettings();
+    listenVideos();
+    listenProgress(user.id);
+    if(user.role==='teacher'||user.role==='admin') listenUsers();
+  }
   // Route by role
   if(user.role==='teacher'){ renderTeacher(); goTo('s-teacher'); }
   else if(user.role==='admin'){ startAdmTimer(); renderAdmin(); goTo('s-admin'); }
@@ -911,17 +940,26 @@ async function admLogin(){
   var p=($('adm-p')||{value:''}).value;
   hideErr('lerr');
   if(!rl('admin_'+u,3)){ showErr('lerr','Too many admin attempts.'); return; }
-  
-  // Load admin credentials from Firestore settings
-  var settings=await fsGet('settings','global');
-  var adminUser=settings&&settings.adminUser?settings.adminUser:'admin';
-  var adminPass=settings&&settings.adminPass?settings.adminPass:'Kav3er@Admin#2025';
-  
+
+  // Default credentials (hardcoded fallback — works even without Firestore)
+  var adminUser='admin';
+  var adminPass='Kav3er@Admin#2025';
+
+  // If Firestore available, try to load updated credentials
+  if(db){
+    try{
+      var settings=await fsGet('settings','global');
+      if(settings&&settings.adminUser) adminUser=settings.adminUser;
+      if(settings&&settings.adminPass) adminPass=settings.adminPass;
+    }catch(e){ /* use hardcoded defaults */ }
+  }
+
   if(u===adminUser&&p===adminPass){
     ST.user={id:'ADMIN',name:'Admin',role:'admin',email:'admin@kaveer.app'};
     if($('adm-u'))$('adm-u').value=''; if($('adm-p'))$('adm-p').value='';
     window._isAdmin=true;
-    listenSettings(); listenUsers(); listenVideos();
+    // Start listeners only if Firebase is configured
+    if(db){ listenSettings(); listenUsers(); listenVideos(); }
     startAdmTimer(); renderAdmin(); goTo('s-admin');
     setTimeout(initMobileNav,100);
   }else showErr('lerr','Invalid admin credentials.');
@@ -1195,6 +1233,15 @@ function renderLanding(){
 // ── Student Dashboard ─────────────────────────────────────────
 function renderStudent(){
   var u=ST.user;
+  // If no videos loaded yet (Firestore not set up), show demo videos
+  if(ST.videos.length===0){
+    ST.videos=[
+      {id:'v1',ytId:'RBSGKlAvoiM',title:'Data Structures — Arrays & Linked Lists',topic:'Data Structures',course:'DSA',subj:'B.Tech CSE',channel:'Abdul Bari',dur:3541,tid:'T001',seq:0,tags:['DSA','CSE']},
+      {id:'v2',ytId:'pkYVOmU3MgA',title:'Operating Systems — Process Scheduling',topic:'Operating Systems',course:'Operating Systems',subj:'B.Tech CSE',channel:'Gate Smashers',dur:2634,tid:'T001',seq:1,tags:['OS','CSE']},
+      {id:'v3',ytId:'zhjVZNot_fY',title:'Computer Networks — OSI Model',topic:'Computer Networks',course:'Computer Networks',subj:'B.Tech CSE',channel:'Gate Smashers',dur:3112,tid:'T001',seq:2,tags:['Networks','CSE']},
+    ];
+  }
+
   var av=$('st-av'); if(av){ if(u.googlePic){av.innerHTML='<img src="'+u.googlePic+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';}else av.textContent=u.av||u.name[0]||'?'; }
   var hi=$('st-hi-nav'); if(hi) hi.textContent=u.name.split(' ')[0];
   showSec('home',document.querySelector('#s-student .si.on'));
