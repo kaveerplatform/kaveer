@@ -551,20 +551,36 @@ textarea.fi{resize:vertical;min-height:80px}
 
 
 
+
 // ═══════════════════════════════════════════════════════════════
 // KAVEER v8 — Complete JavaScript
 // Real-time Firestore database — works across ALL devices
 // ═══════════════════════════════════════════════════════════════
 
 // ── Firebase Config (set by admin via Settings) ───────────────
+// ── HARDCODED CONFIG (replaced by "Download Configured Site") ──
+// These placeholders are filled when admin clicks "Download Configured Site"
+// Upload that file to GitHub → works on ALL devices automatically
+var _HC_API_KEY      = ''; // KAVEER_PLACEHOLDER_APIKEY
+var _HC_AUTH_DOMAIN  = ''; // KAVEER_PLACEHOLDER_AUTHDOMAIN
+var _HC_PROJECT_ID   = ''; // KAVEER_PLACEHOLDER_PROJECTID
+var _HC_APP_ID       = ''; // KAVEER_PLACEHOLDER_APPID
+var _HC_BREVO_KEY    = ''; // KAVEER_PLACEHOLDER_BREVOKEY
+var _HC_BREVO_FROM   = ''; // KAVEER_PLACEHOLDER_BREVOFROM
+var _HC_BREVO_NAME   = ''; // KAVEER_PLACEHOLDER_BREVONAME
+
+// FB_CONFIG uses hardcoded values if available, else empty
 var FB_CONFIG = {
-  apiKey:      '',
-  authDomain:  '',
-  projectId:   '',
-  appId:       '',
-  storageBucket: '',
+  apiKey:      _HC_API_KEY,
+  authDomain:  _HC_AUTH_DOMAIN,
+  projectId:   _HC_PROJECT_ID,
+  appId:       _HC_APP_ID,
+  storageBucket: _HC_PROJECT_ID ? _HC_PROJECT_ID+'.appspot.com' : '',
   messagingSenderId: ''
 };
+
+// Also apply Brevo from hardcoded if available
+if(_HC_BREVO_KEY){ BREVO_KEY=_HC_BREVO_KEY; BREVO_FROM=_HC_BREVO_FROM; BREVO_NAME=_HC_BREVO_NAME||'KAVEER'; }
 
 var fbApp = null, fbAuth = null, db = null;
 var UNSUBSCRIBERS = []; // real-time listeners to clean up on logout
@@ -2082,8 +2098,14 @@ async function saveVideo(){
     var ytId=extractYtId(url);
     if(!ytId){toast('Invalid YouTube URL','err');return;}
     if(ST.videos.find(function(v){return v.ytId===ytId;})){toast('Video already added!','err');return;}
-    var newId=await fsAdd('videos',{ytId,title,topic,channel,course,subj,notesLink:notes,dur:3600,tid:ST.user.id,seq:ST.videos.length,tags:[topic,subj].filter(Boolean),desc:topic});
-    if(!newId){toast('Failed to add video','err');return;}
+    var quiz1=sanR(($('av-quiz')||{value:''}).value).trim();
+    var quiz2v=sanR(($('av-quiz2')||{value:''}).value).trim();
+    var splash=sanR(($('av-splash')||{value:''}).value).trim();
+    var newVidData={ytId,title,topic,channel,course,subj,notesLink:notes,quizLink:quiz1,quiz2:quiz2v,splashImg:splash,dur:3600,tid:ST.user.id,seq:ST.videos.length,tags:[topic,subj,channel].filter(Boolean),desc:topic};
+    var newId=await fsAdd('videos',newVidData);
+    if(!newId){toast('Failed to add video — is Firebase configured?','err');return;}
+    // Notify interested students
+    try{ notifyInterestedStudents(Object.assign({id:newId},newVidData)); }catch(e){}
     toast('"'+title+'" added! All students see it now.');
   }
   if(mo)mo.remove();
@@ -2308,7 +2330,8 @@ function admSet(){
     +'</div>'
     +'<button class="btn btn-t" onclick="saveFirebaseCfg()">Save Firebase Config</button>'
     +(cfg.apiKey?'<span class="badge bt" style="margin-left:10px">✓ Configured</span>':'<span class="badge br" style="margin-left:10px">Not set</span>')
-    +'<div class="info-box" style="margin-top:12px">After saving: reload page → Google Sign-In activates automatically.</div>'
+    +'<div class="info-box" style="margin-top:12px;border-color:var(--ac2)"><strong>⚠ Important after saving:</strong> Click the button below to download the configured file and upload it to GitHub. This is the ONLY way to make Firebase work on ALL devices permanently. localStorage only works on this one browser.</div>'
+    +'<button class="btn btn-t" onclick="downloadConfiguredSite()" style="margin-top:10px;width:100%">⬇ Download Configured Site (upload this to GitHub)</button>'
   +'</div>'
   +'<div class="box"><div class="boxt">📧 Brevo Email OTP</div>'
     +'<p style="font-size:13px;color:var(--mu);margin-bottom:12px">Free 300 emails/day. <a href="https://app.brevo.com" target="_blank" style="color:var(--tl)">Get API key at brevo.com</a></p>'
@@ -2345,17 +2368,17 @@ async function saveFirebaseCfg(){
   var appId=sanR(($('fb-appid')||{value:''}).value).trim();
   if(!apiKey||!authDomain||!projectId){toast('API Key, Auth Domain and Project ID required','err');return;}
   var cfg={apiKey,authDomain,projectId,appId};
-  // Save to Firestore (if already connected)
-  if(db){ try{ await saveSettings({fbConfig:cfg}); }catch(e){} }
-  // ALSO save to localStorage — this is the bootstrap for new devices
+  // Save to localStorage (works on this device immediately)
   localStorage.setItem('kv_fb_bootstrap', JSON.stringify(cfg));
   FB_CONFIG=cfg;
-  if(initFirebase(cfg)){
-    // Now Firebase is running — also save to Firestore
+  // Initialize Firebase with new config
+  var ok = initFirebase(cfg);
+  if(ok){
+    // Save to Firestore now that Firebase is running
     try{ await saveSettings({fbConfig:cfg}); }catch(e){}
-    toast('Firebase configured! ✅ Works on ALL devices now. Reload to apply.');
+    toast('✅ Firebase saved! Now click "⬇ Download Configured Site" below and upload to GitHub — this makes it work on ALL devices permanently.');
   }else{
-    toast('Saved locally — reload page to activate.','inf');
+    toast('Saved! Reload the page to activate Firebase.','inf');
   }
 }
 
@@ -2433,35 +2456,39 @@ document.addEventListener('keydown',function(e){
 
 // ── Page Init ─────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',function(){
-  // ── BOOTSTRAP: load Firebase config from localStorage FIRST ──
-  // This makes Firebase work on ANY device without manual setup
+  // ── BOOTSTRAP: Initialize Firebase from hardcoded config or localStorage ──
+  // Priority: 1) Hardcoded in file  2) localStorage  3) Prompt admin
   (function(){
     try{
-      var stored=localStorage.getItem('kv_fb_bootstrap');
-      if(stored){
-        var cfg=JSON.parse(stored);
-        // Also load Brevo bootstrap
-      try{
-        var brev=localStorage.getItem('kv_brevo_bootstrap');
+      // Try hardcoded config first (baked into file by admin)
+      var cfg = null;
+      if(_HC_API_KEY && _HC_AUTH_DOMAIN && _HC_PROJECT_ID){
+        cfg = {apiKey:_HC_API_KEY, authDomain:_HC_AUTH_DOMAIN, projectId:_HC_PROJECT_ID, appId:_HC_APP_ID};
+        console.log('[KAVEER] Using hardcoded Firebase config');
+      }
+      // Fallback: try localStorage bootstrap (from previous save on THIS device)
+      if(!cfg){
+        var stored = localStorage.getItem('kv_fb_bootstrap');
+        if(stored){ cfg = JSON.parse(stored); console.log('[KAVEER] Using localStorage bootstrap'); }
+      }
+      // Apply Brevo from hardcoded
+      if(_HC_BREVO_KEY){ BREVO_KEY=_HC_BREVO_KEY; BREVO_FROM=_HC_BREVO_FROM; BREVO_NAME=_HC_BREVO_NAME||'KAVEER'; }
+      // Fallback: Brevo from localStorage
+      if(!BREVO_KEY){
+        var brev = localStorage.getItem('kv_brevo_bootstrap');
         if(brev){ var b=JSON.parse(brev); BREVO_KEY=b.key||''; BREVO_FROM=b.from||''; BREVO_NAME=b.name||'KAVEER'; }
-      }catch(e){}
-      if(cfg&&cfg.apiKey&&cfg.authDomain&&cfg.projectId){
-          if(initFirebase(cfg)){
-            console.log('[KAVEER] Firebase auto-initialised from localStorage bootstrap');
-            // After Firebase is ready, load full settings from Firestore
-            setTimeout(function(){
-              checkFirebaseRedirectResult();
-              loadSettings().then(function(){
-                // If Firestore has updated config, refresh bootstrap
-                if(FB_CONFIG&&FB_CONFIG.apiKey){
-                  localStorage.setItem('kv_fb_bootstrap',JSON.stringify(FB_CONFIG));
-                }
-              });
-            },500);
-          }
+      }
+      if(cfg && cfg.apiKey && cfg.authDomain && cfg.projectId){
+        if(initFirebase(cfg)){
+          console.log('[KAVEER] Firebase ready');
+          setTimeout(function(){
+            checkFirebaseRedirectResult();
+            // Load remaining settings from Firestore
+            loadSettings();
+          }, 400);
         }
       }
-    }catch(e){ console.warn('[KAVEER] Bootstrap failed:',e); }
+    }catch(e){ console.warn('[KAVEER] Bootstrap error:',e); }
   })();
 
   // ── Render UI ──
@@ -3253,8 +3280,56 @@ async function notifyInterestedStudents(video){
   }
 }
 
+// ── Download Configured Site ──────────────────────────────────
+// This bakes Firebase config INTO the HTML file.
+// Upload the downloaded file to GitHub → works on ALL devices.
+function downloadConfiguredSite(){
+  var apiKey     = FB_CONFIG && FB_CONFIG.apiKey     ? FB_CONFIG.apiKey     : (document.getElementById('fb-apikey')     ? document.getElementById('fb-apikey').value     : '');
+  var authDomain = FB_CONFIG && FB_CONFIG.authDomain ? FB_CONFIG.authDomain : (document.getElementById('fb-authdomain') ? document.getElementById('fb-authdomain').value : '');
+  var projectId  = FB_CONFIG && FB_CONFIG.projectId  ? FB_CONFIG.projectId  : (document.getElementById('fb-projectid')  ? document.getElementById('fb-projectid').value  : '');
+  var appId      = FB_CONFIG && FB_CONFIG.appId      ? FB_CONFIG.appId      : (document.getElementById('fb-appid')      ? document.getElementById('fb-appid').value      : '');
+  var brevoKey   = BREVO_KEY  || '';
+  var brevoFrom  = BREVO_FROM || '';
+  var brevoName  = BREVO_NAME || 'KAVEER';
 
+  if(!apiKey || !authDomain || !projectId){
+    toast('Set up Firebase config first, then download','err');
+    return;
+  }
 
+  // Get the current page HTML
+  var pageHTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+  // Replace placeholder comments with actual values
+  var replacements = [
+    ["var _HC_API_KEY      = ''; // KAVEER_PLACEHOLDER_APIKEY",     "var _HC_API_KEY      = '"+apiKey.replace(/'/g,"\'")+"'; // configured"],
+    ["var _HC_AUTH_DOMAIN  = ''; // KAVEER_PLACEHOLDER_AUTHDOMAIN", "var _HC_AUTH_DOMAIN  = '"+authDomain.replace(/'/g,"\'")+"'; // configured"],
+    ["var _HC_PROJECT_ID   = ''; // KAVEER_PLACEHOLDER_PROJECTID",  "var _HC_PROJECT_ID   = '"+projectId.replace(/'/g,"\'")+"'; // configured"],
+    ["var _HC_APP_ID       = ''; // KAVEER_PLACEHOLDER_APPID",      "var _HC_APP_ID       = '"+appId.replace(/'/g,"\'")+"'; // configured"],
+    ["var _HC_BREVO_KEY    = ''; // KAVEER_PLACEHOLDER_BREVOKEY",   "var _HC_BREVO_KEY    = '"+brevoKey.replace(/'/g,"\'")+"'; // configured"],
+    ["var _HC_BREVO_FROM   = ''; // KAVEER_PLACEHOLDER_BREVOFROM",  "var _HC_BREVO_FROM   = '"+brevoFrom.replace(/'/g,"\'")+"'; // configured"],
+    ["var _HC_BREVO_NAME   = ''; // KAVEER_PLACEHOLDER_BREVONAME",  "var _HC_BREVO_NAME   = '"+brevoName.replace(/'/g,"\'")+"'; // configured"],
+  ];
+
+  var found = 0;
+  replacements.forEach(function(pair){
+    if(pageHTML.indexOf(pair[0]) >= 0){ pageHTML = pageHTML.replace(pair[0], pair[1]); found++; }
+  });
+
+  if(found === 0){
+    toast('Placeholders not found — you may already have a configured file. Just re-upload to GitHub.','inf');
+    return;
+  }
+
+  var blob = new Blob([pageHTML], {type:'text/html;charset=utf-8;'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'index.html';
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  toast('✅ index.html downloaded! Upload this to GitHub — Firebase will work on ALL devices.');
+}
 
 </script>
 </body>
