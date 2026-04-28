@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>KAVEER — Learn · Grow · Excel</title>
 
 <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://apis.google.com/_/scs/abc-static/_/js/k=gapi.lb.en.HLcjcliCxoY.O/m=gapi_iframes/rt=j/sv=1/d=1/ed=1/rs=AHpOoo-EKlLcELGvY6Qdg_kTBmN3Ra8MLw/cb=gapi.loaded_0?le=scs" async=""></script><script type="text/javascript" id="www-widgetapi-script" src="https://www.youtube.com/s/player/8456c9de/www-widgetapi.vflset/www-widgetapi.js" async=""></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 
 <style>
 /* ── Design Tokens ─────────────────────────────────────────── */
@@ -252,15 +251,15 @@ textarea.fi{resize:vertical;min-height:80px}
   .sg{grid-template-columns:repeat(4,1fr)}
 }
 </style>
-</head>
+<script src="https://www.youtube.com/iframe_api" async=""></script><script src="https://apis.google.com/js/api.js?onload=__iframefcb962496" type="text/javascript" charset="UTF-8" gapi_processed="true"></script></head>
 <body>
 
 <!-- ══ TOAST ════════════════════════════════════════════════ -->
-<div id="toast"></div>
+<div id="toast" class="toast tok" style="display: none;">Share message saved!</div>
 
 <!-- ══ LANDING ══════════════════════════════════════════════ -->
-<div id="s-landing" class="screen on">
-  <div id="landing-page"></div>
+<div id="s-landing" class="screen">
+  <div id="landing-page"><div style="background:var(--bg);min-height:100vh"><nav style="position:sticky;top:0;z-index:100;background:rgba(13,13,20,.96);border-bottom:1px solid var(--bd);backdrop-filter:blur(12px);padding:0 5vw;height:62px;display:flex;align-items:center;justify-content:space-between"><div class="klogo" style="font-size:22px;cursor:pointer" onclick="window.scrollTo(0,0)">KAV<span class="e">E</span>ER</div><div style="display:flex;align-items:center;gap:8px"><select class="lang-sel" onchange="setLang(this.value)" style="background:var(--sf);border:1px solid var(--bd2);border-radius:var(--r);color:var(--wh);padding:5px 10px;font-size:12px;cursor:pointer;outline:none"><option value="en" selected="">English</option><option value="hi">हिन्दी</option><option value="zh">中文</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="ar">العربية</option><option value="pt">Português</option><option value="te">తెలుగు</option><option value="bn">বাংলা</option></select><button onclick="goTo('s-login')" style="padding:7px 14px;border-radius:var(--r);background:transparent;border:1.5px solid var(--bd2);color:var(--wh);cursor:pointer;font-size:13px;font-weight:600">Sign In</button><button onclick="goTo('s-reg');showRStep(1)" class="btn btn-t btn-sm">Register Free →</button></div></nav><section style="padding:64px 5vw 48px;text-align:center;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)"><div style="display:inline-flex;align-items:center;gap:7px;background:rgba(0,201,167,.1);border:1px solid rgba(0,201,167,.2);padding:6px 16px;border-radius:100px;font-size:12px;font-weight:700;color:var(--tl);margin-bottom:20px">✨ 100% Free · Real-time · No Ads</div><h1 style="font-family:var(--fd);font-size:clamp(26px,5vw,52px);font-weight:800;line-height:1.15;color:var(--wh);margin-bottom:14px">Free Interactive Learning for Every Student</h1><p style="font-size:clamp(14px,2vw,17px);color:var(--mu);max-width:560px;margin:0 auto 28px;line-height:1.75">Learn · Grow · Excel</p><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:18px"><button onclick="goTo('s-reg');showRStep(1)" class="btn btn-t" style="font-size:16px;padding:14px 32px;border-radius:12px">🚀 Register Free</button><button onclick="goTo('s-login')" class="btn btn-o" style="font-size:16px;padding:14px 26px;border-radius:12px">Sign In →</button></div><p style="font-size:12px;color:var(--mu)">Students &amp; teachers on every device — real-time</p></section><section style="padding:40px 5vw;background:var(--bg2);border-top:1px solid var(--bd)"><h2 style="font-family:var(--fd);font-size:clamp(18px,3vw,24px);font-weight:700;text-align:center;margin-bottom:6px">About KAVEER</h2><p style="text-align:center;color:var(--mu);max-width:600px;margin:0 auto 24px;line-height:1.8">KAVEER is a free learning platform built by a young student. Watch videos with auto-pausing quizzes, track progress, compete on leaderboard — all free.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;max-width:900px;margin:0 auto"><div style="background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:16px;text-align:center"><div style="font-size:28px;margin-bottom:8px">📹</div><div style="font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:4px">Free Videos</div><div style="font-size:12px;color:var(--mu)">Watch on any device</div></div><div style="background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:16px;text-align:center"><div style="font-size:28px;margin-bottom:8px">❓</div><div style="font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:4px">Auto Quizzes</div><div style="font-size:12px;color:var(--mu)">Pauses at right moment</div></div><div style="background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:16px;text-align:center"><div style="font-size:28px;margin-bottom:8px">📊</div><div style="font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:4px">Real-time Progress</div><div style="font-size:12px;color:var(--mu)">Teacher sees live</div></div><div style="background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:16px;text-align:center"><div style="font-size:28px;margin-bottom:8px">🏆</div><div style="font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:4px">Leaderboard</div><div style="font-size:12px;color:var(--mu)">Compete across India</div></div></div></section><section style="padding:44px 5vw;border-top:1px solid var(--bd)"><div style="max-width:720px;margin:0 auto"><h2 style="font-family:var(--fd);font-size:clamp(18px,3vw,24px);font-weight:700;text-align:center;margin-bottom:6px">What Students Say</h2><p style="text-align:center;color:var(--mu);font-size:13px;margin-bottom:28px">Real students, real results</p><div style="display:flex;align-items:flex-start;gap:14px;flex-direction:row;margin-bottom:20px"><div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--tl),rgba(124,92,191,.5));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">PS</div><div style="background:var(--sf);border:1px solid var(--bd2);border-radius:0 var(--r2) var(--r2) var(--r2);padding:14px 16px;flex:1;position:relative"><div style="position:absolute;left:-8px;top:12px;width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:8px solid var(--bd2)"></div><p style="font-size:13px;line-height:1.75;color:var(--wh);margin-bottom:10px">"KAVEER completely changed how I prepare for GATE. The auto-pausing questions at exactly the right moment are brilliant!"</p><div style="display:flex;align-items:center;gap:6px"><div style="font-size:13px;font-weight:700">Priya Sharma</div><span style="color:var(--mu)">·</span><div style="font-size:11px;color:var(--mu)">B.Tech CSE, IIT Delhi</div></div></div></div><div style="display:flex;align-items:flex-start;gap:14px;flex-direction:row-reverse;margin-bottom:20px"><div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#b09af0,rgba(124,92,191,.5));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">RV</div><div style="background:var(--sf);border:1px solid var(--bd2);border-radius:var(--r2) 0 var(--r2) var(--r2);padding:14px 16px;flex:1;position:relative"><div style="position:absolute;right:-8px;top:12px;width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:8px solid var(--bd2)"></div><p style="font-size:13px;line-height:1.75;color:var(--wh);margin-bottom:10px">"Free, no ads, and the questions after each topic actually test understanding — not memory. Recommend to every student!"</p><div style="display:flex;align-items:center;gap:6px"><div style="font-size:13px;font-weight:700">Rahul Verma</div><span style="color:var(--mu)">·</span><div style="font-size:11px;color:var(--mu)">UPSC Aspirant, Jaipur</div></div></div></div><div style="display:flex;align-items:flex-start;gap:14px;flex-direction:row;margin-bottom:20px"><div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--ac2),rgba(124,92,191,.5));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">SP</div><div style="background:var(--sf);border:1px solid var(--bd2);border-radius:0 var(--r2) var(--r2) var(--r2);padding:14px 16px;flex:1;position:relative"><div style="position:absolute;left:-8px;top:12px;width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:8px solid var(--bd2)"></div><p style="font-size:13px;line-height:1.75;color:var(--wh);margin-bottom:10px">"The auto-pausing questions every few minutes keep me engaged throughout. Brilliant concept!"</p><div style="display:flex;align-items:center;gap:6px"><div style="font-size:13px;font-weight:700">Sneha Patel</div><span style="color:var(--mu)">·</span><div style="font-size:11px;color:var(--mu)">B.Tech ME, NIT Surat</div></div></div></div><div style="display:flex;align-items:flex-start;gap:14px;flex-direction:row-reverse;margin-bottom:20px"><div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--ac),rgba(124,92,191,.5));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">AS</div><div style="background:var(--sf);border:1px solid var(--bd2);border-radius:var(--r2) 0 var(--r2) var(--r2);padding:14px 16px;flex:1;position:relative"><div style="position:absolute;right:-8px;top:12px;width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:8px solid var(--bd2)"></div><p style="font-size:13px;line-height:1.75;color:var(--wh);margin-bottom:10px">"The progress tracking and leaderboard actually motivate me to study more consistently."</p><div style="display:flex;align-items:center;gap:6px"><div style="font-size:13px;font-weight:700">Arjun Singh</div><span style="color:var(--mu)">·</span><div style="font-size:11px;color:var(--mu)">SSC CGL Prep, Delhi</div></div></div></div></div></section><section style="padding:36px 5vw;text-align:center;border-top:1px solid var(--bd);background:var(--bg2)"><h2 style="font-family:var(--fd);font-size:20px;font-weight:700;margin-bottom:5px">Share KAVEER 📣</h2><p style="font-size:13px;color:var(--mu);margin-bottom:10px">Help a friend discover free learning</p><div style="display:flex;justify-content:center"><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px"><button onclick="shareKaveer('whatsapp')" style="display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:100px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:#25D36615;color:#25D366;transition:opacity .15s">💬 WhatsApp</button><button onclick="shareKaveer('telegram')" style="display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:100px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:#26A5E415;color:#26A5E4;transition:opacity .15s">✈️ Telegram</button><button onclick="shareKaveer('twitter')" style="display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:100px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:#1DA1F215;color:#1DA1F2;transition:opacity .15s">🐦 Twitter</button><button onclick="shareKaveer('facebook')" style="display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:100px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:#1877F215;color:#1877F2;transition:opacity .15s">📘 Facebook</button><button onclick="shareKaveer('linkedin')" style="display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:100px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:#0A66C215;color:#0A66C2;transition:opacity .15s">💼 LinkedIn</button></div></div></section><footer style="padding:20px 5vw;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:var(--bg2)"><div class="klogo" style="font-size:18px">KAV<span class="e">E</span>ER</div><p style="font-size:12px;color:var(--mu)">Built with ❤️ for every student</p><p style="font-size:12px;color:var(--mu)">© 2025 KAVEER · Free forever</p></footer></div></div>
 </div>
 
 <!-- ══ LOGIN ════════════════════════════════════════════════ -->
@@ -271,16 +270,16 @@ textarea.fi{resize:vertical;min-height:80px}
       <div class="klogo" style="font-size:32px;justify-content:center">KAV<span class="e">E</span>ER</div>
       <div style="font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--mu);margin-top:5px">Learn · Grow · Excel</div>
     </div>
-    <div id="lerr" class="err-box"></div>
-    <div id="l-s1">
+    <div id="lerr" class="err-box" style="display: none;"></div>
+    <div id="l-s1" style="display: none;">
       <!-- Google Sign-In -->
       <button onclick="signInWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;background:#fff;color:#3c4043;border:1.5px solid #dadce0;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;margin-bottom:14px;transition:box-shadow .2s;font-family:var(--fb)" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.15)'" onmouseout="this.style.boxShadow='none'">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
         Continue with Google
       </button>
       <div class="div-line">or sign in with email OTP</div>
       <div class="fg" style="margin-top:12px"><label class="fl">Your Email</label>
-        <input class="fi" id="l-email" type="email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')sendOtp()"/>
+        <input class="fi" id="l-email" type="email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')sendOtp()">
       </div>
       <button class="btn btn-t full" onclick="sendOtp()" style="font-size:14px;padding:12px">Send OTP →</button>
       <div class="div-line">new here?</div>
@@ -297,15 +296,15 @@ textarea.fi{resize:vertical;min-height:80px}
         <div id="otp-demo" class="info-box" style="display:none;margin-top:10px;text-align:left"></div>
       </div>
       <div class="otp-row" id="l-otp"></div>
-      <button class="btn btn-t full" onclick="verOtp()" style="font-size:15px;padding:13px">Verify & Sign In →</button>
+      <button class="btn btn-t full" onclick="verOtp()" style="font-size:15px;padding:13px">Verify &amp; Sign In →</button>
       <div style="text-align:center;margin-top:12px">
         <a onclick="backEmail()" style="color:var(--tl);cursor:pointer;font-size:13px">← Change email</a>
       </div>
     </div>
-    <div id="l-adm" style="display:none">
-      <div class="fg"><label class="fl">Admin Username</label><input class="fi" id="adm-u" placeholder="admin" onkeydown="if(event.key==='Enter')admLogin()"/></div>
+    <div id="l-adm" style="display: block;">
+      <div class="fg"><label class="fl">Admin Username</label><input class="fi" id="adm-u" placeholder="admin" onkeydown="if(event.key==='Enter')admLogin()"></div>
       <div class="fg"><label class="fl">Password</label>
-        <div style="position:relative"><input class="fi" id="adm-p" type="password" placeholder="••••••••" style="padding-right:42px" onkeydown="if(event.key==='Enter')admLogin()"/>
+        <div style="position:relative"><input class="fi" id="adm-p" type="password" placeholder="••••••••" style="padding-right:42px" onkeydown="if(event.key==='Enter')admLogin()">
         <button onclick="tpw('adm-p',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--mu)">👁</button></div>
       </div>
       <button class="btn btn-t full" onclick="admLogin()" style="font-size:15px;padding:13px">Admin Sign In →</button>
@@ -323,11 +322,9 @@ textarea.fi{resize:vertical;min-height:80px}
     <div style="text-align:center;margin-bottom:20px">
       <div class="klogo" style="font-size:26px;justify-content:center">KAV<span class="e">E</span>ER</div>
     </div>
-    <div class="sb"><div class="sb-step" id="rb0"></div><div class="sb-step" id="rb1"></div><div class="sb-step" id="rb2"></div></div>
-    <div id="rerr" class="err-box"></div>
-    <div id="r-s1"><div id="r-s1-inner">
-      <div class="loading-full"><div class="spin"></div></div>
-    </div></div>
+    <div class="sb"><div class="sb-step" id="rb0" style="background: var(--ac);"></div><div class="sb-step" id="rb1" style="background: var(--bd2);"></div><div class="sb-step" id="rb2" style="background: var(--bd2);"></div></div>
+    <div id="rerr" class="err-box" style="display: none;"></div>
+    <div id="r-s1" style="display: block;"><div id="r-s1-inner"><h2 style="font-family:var(--fd);margin-bottom:16px;font-size:18px">Create Account</h2><button onclick="signInWithGoogle()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 16px; background: rgb(255, 255, 255); color: rgb(60, 64, 67); border: 1.5px solid rgb(218, 220, 224); border-radius: var(--r); font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 14px; box-shadow: none;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.15)'" onmouseout="this.style.boxShadow='none'"><svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>Sign up with Google</button><div class="div-line">or register with email</div><div class="fg"><label class="fl">Full Name *</label><input class="fi" id="r-name" value="" placeholder="Arjun Sharma"></div><div class="fg"><label class="fl">Email *</label><input class="fi" id="r-email" type="email" value="" placeholder="arjun@email.com"></div><div class="fg"><label class="fl">WhatsApp Number</label><div style="display:flex;gap:8px"><span style="padding:11px 12px;background:var(--sf);border:1.5px solid var(--bd2);border-radius:var(--r);color:var(--mu);font-size:14px;flex-shrink:0">+91</span><input class="fi" id="r-wa" type="tel" placeholder="9876543210" maxlength="10" style="flex:1"></div></div><div class="fg"><label class="fl">Institution Code <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--mu)">(from teacher, optional)</span></label><input class="fi" id="r-code" placeholder="e.g. IITD2025"></div><div class="info-box" style="margin-bottom:14px">📚 Set your subject interests anytime from My Profile after joining.</div><button class="btn btn-t full" onclick="regS1()" style="font-size:15px;padding:13px">Send OTP →</button><p style="text-align:center;margin-top:12px">Have account? <a onclick="goTo('s-login')" style="color:var(--tl);cursor:pointer">Sign in</a></p></div></div>
     <div id="r-s2" style="display:none">
       <div style="text-align:center;margin-bottom:14px">
         <h2 style="font-family:var(--fd)">Verify Email</h2>
@@ -335,7 +332,7 @@ textarea.fi{resize:vertical;min-height:80px}
         <div id="r-otp-demo" class="info-box" style="display:none;margin-top:10px"></div>
       </div>
       <div class="otp-row" id="r-otp"></div>
-      <button class="btn btn-t full" onclick="regVer()" style="font-size:15px;padding:13px">Verify & Continue →</button>
+      <button class="btn btn-t full" onclick="regVer()" style="font-size:15px;padding:13px">Verify &amp; Continue →</button>
       <div style="text-align:center;margin-top:12px"><a onclick="showRStep(1)" style="color:var(--tl);cursor:pointer;font-size:13px">← Back</a></div>
     </div>
     <div id="r-s3" style="display:none">
@@ -379,7 +376,7 @@ textarea.fi{resize:vertical;min-height:80px}
       <div class="loading-full"><div class="spin"></div><span style="color:var(--mu)">Loading...</span></div>
     </main>
   </div>
-  <nav id="mob-nav" id="mob-nav-st"></nav>
+  
 </div>
 
 <!-- ══ TEACHER DASHBOARD ══════════════════════════════════════ -->
@@ -408,7 +405,7 @@ textarea.fi{resize:vertical;min-height:80px}
 </div>
 
 <!-- ══ ADMIN DASHBOARD ════════════════════════════════════════ -->
-<div id="s-admin" class="screen">
+<div id="s-admin" class="screen on">
   <div class="layout">
     <nav class="sidebar">
       <div style="margin-bottom:20px">
@@ -416,20 +413,18 @@ textarea.fi{resize:vertical;min-height:80px}
         <div style="font-size:10px;color:var(--ac2);margin-top:2px">Admin Console</div>
       </div>
       <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Session</div>
-      <div id="sess-t" style="font-size:14px;font-weight:700;color:var(--ac2);margin-bottom:16px">30:00</div>
+      <div id="sess-t" style="font-size:14px;font-weight:700;color:var(--ac2);margin-bottom:16px">29:13</div>
       <div class="si-lbl">Admin</div>
-      <button class="si on" onclick="showAdmSec('overview',this)"><span class="si-ic">📊</span>Overview</button>
+      <button class="si" onclick="showAdmSec('overview',this)"><span class="si-ic">📊</span>Overview</button>
       <button class="si" onclick="showAdmSec('students',this)"><span class="si-ic">👥</span>All Users</button>
       <button class="si" onclick="showAdmSec('videos',this)"><span class="si-ic">🎬</span>Videos</button>
       <button class="si" onclick="showAdmSec('testimonials',this)"><span class="si-ic">💬</span>Testimonials</button>
       <button class="si" onclick="showAdmSec('requests',this)"><span class="si-ic">📥</span>Requests</button>
-      <button class="si" onclick="showAdmSec('settings',this)"><span class="si-ic">⚙️</span>Settings</button>
+      <button class="si on" onclick="showAdmSec('settings',this)"><span class="si-ic">⚙️</span>Settings</button>
       <div class="si-sep"></div>
       <button class="si" onclick="logout()" style="color:var(--mu)"><span class="si-ic">🚪</span>Sign Out</button>
     </nav>
-    <main class="main" id="adm-main">
-      <div class="loading-full"><div class="spin"></div></div>
-    </main>
+    <main class="main" id="adm-main" data-sec="settings"><div style="margin-bottom:16px"><h2 style="font-family:var(--fd)">⚙️ Platform Settings</h2></div><div class="box"><div class="boxt">🔥 Firebase Configuration</div><p style="font-size:13px;color:var(--mu);margin-bottom:14px">Get from <a href="https://console.firebase.google.com" target="_blank" style="color:var(--tl)">console.firebase.google.com</a> → Project Settings → Your Apps → firebaseConfig</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="fl">API Key *</label><input class="fi" id="fb-apikey" value="AIzaSyCQ3s1E1Kb9DbZrQTcMkKBSvzyLxieM7cQ" placeholder="AIzaSy..."></div><div><label class="fl">Auth Domain *</label><input class="fi" id="fb-authdomain" value="kaveer-6f771.firebaseapp.com" placeholder="app.firebaseapp.com"></div><div><label class="fl">Project ID *</label><input class="fi" id="fb-projectid" value="kaveer-6f771" placeholder="your-project-id"></div><div><label class="fl">App ID</label><input class="fi" id="fb-appid" value="1:421590906831:web:f2cac514884b6d1b64c4ba" placeholder="1:123:web:abc"></div></div><button class="btn btn-t" onclick="saveFirebaseCfg()">Save Firebase Config</button><span class="badge bt" style="margin-left:10px">✓ Configured</span><div class="info-box" style="margin-top:12px;border-color:var(--ac2)"><strong>⚠ Important after saving:</strong> Click the button below to download the configured file and upload it to GitHub. This is the ONLY way to make Firebase work on ALL devices permanently. localStorage only works on this one browser.</div><button class="btn btn-t" onclick="downloadConfiguredSite()" style="margin-top:10px;width:100%">⬇ Download Configured Site (upload this to GitHub)</button></div><div class="box"><div class="boxt">📧 Brevo Email OTP</div><p style="font-size:13px;color:var(--mu);margin-bottom:12px">Free 300 emails/day. <a href="https://app.brevo.com" target="_blank" style="color:var(--tl)">Get API key at brevo.com</a></p><div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-bottom:10px"><div><label class="fl">Brevo API Key</label><input class="fi" id="brevo-k" value="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" placeholder="xkeysib-..."></div><button class="btn btn-t" onclick="saveBrevoSettings()" style="margin-top:18px">Save</button></div><div class="fg"><label class="fl">Sender Email</label><input class="fi" id="brevo-f" value="kaveer.platform@gmail.com" placeholder="noreply@yourdomain.com"></div><div class="fg"><label class="fl">Sender Name</label><input class="fi" id="brevo-n" value="KAVEER" placeholder="KAVEER"></div><span class="badge bt">✓ Configured</span></div><div class="box"><div class="boxt">📺 Social Links</div><div class="fg"><label class="fl">YouTube Channel URL</label><div style="display:flex;gap:9px"><input class="fi" id="yt-url-i" value=""><button class="btn btn-t btn-sm" onclick="saveSocialLinks()">Save</button></div></div><div class="fg"><label class="fl">LinkedIn URL</label><input class="fi" id="li-url-i" value=""></div></div><div class="box"><div class="boxt">📣 Share Message</div><p style="font-size:13px;color:var(--mu);margin-bottom:8px">Max 200 characters (Twitter limit). URL added automatically.</p><div id="share-char-count" style="font-size:11px;color:var(--mu);text-align:right;margin-bottom:5px">69 / 200</div><textarea class="fi" id="share-msg-i" rows="2" maxlength="200" oninput="document.getElementById('share-char-count').textContent=this.value.length+' / 200'">Join KAVEER — free learning!</textarea><button class="btn btn-t btn-sm" style="margin-top:8px" onclick="saveShareMsg()">Save</button></div><div class="box"><div class="boxt">📋 Profile Fields</div><div class="tw"><table><thead><tr><th>Field</th><th>Required?</th></tr></thead><tbody><tr><td><strong>WhatsApp Number</strong></td><td><button class="tog on" onclick="toggleFieldReq('whatsapp',this)"></button></td></tr><tr><td><strong>College / Company</strong></td><td><button class="tog on" onclick="toggleFieldReq('college',this)"></button></td></tr><tr><td><strong>Branch / Department</strong></td><td><button class="tog " onclick="toggleFieldReq('branch',this)"></button></td></tr><tr><td><strong>Learning Goal</strong></td><td><button class="tog on" onclick="toggleFieldReq('objective',this)"></button></td></tr></tbody></table></div></div><div class="box"><div class="boxt">🔐 Admin Credentials</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px"><div><label class="fl">New Username</label><input class="fi" id="adm-new-u" placeholder="admin"></div><div><label class="fl">New Password</label><input class="fi" id="adm-new-p" type="password" placeholder="Min 8 chars"></div></div><button class="btn btn-g btn-sm" onclick="saveAdminCreds()">Update Credentials</button></div></main>
   </div>
 </div>
 
@@ -439,7 +434,7 @@ textarea.fi{resize:vertical;min-height:80px}
   <!-- SPLASH SCREEN (shown 5s before video) -->
   <div id="splash-screen" style="display:none;position:absolute;inset:0;z-index:100;background:#000;align-items:center;justify-content:center;flex-direction:column">
     <div id="splash-img-wrap" style="width:100%;height:100%;position:relative;overflow:hidden">
-      <img id="splash-img" src="" style="width:100%;height:100%;object-fit:cover;opacity:.7"/>
+      <img id="splash-img" src="" style="width:100%;height:100%;object-fit:cover;opacity:.7">
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
         <div class="klogo" style="font-size:clamp(28px,6vw,56px);justify-content:center;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.8)">KAV<span class="e">E</span>ER</div>
         <div id="splash-title" style="font-family:var(--fd);font-size:clamp(16px,3vw,28px);font-weight:700;color:#fff;margin:16px 0 8px;text-shadow:0 2px 12px rgba(0,0,0,.9);max-width:600px;line-height:1.3"></div>
@@ -524,8 +519,8 @@ textarea.fi{resize:vertical;min-height:80px}
         <h2 style="font-family:var(--fd);font-size:clamp(18px,4vw,26px);margin-bottom:6px">Video Complete!</h2>
         <div id="end-score-ring" style="width:100px;height:100px;margin:14px auto;position:relative">
           <svg viewBox="0 0 100 100" width="100" height="100">
-            <circle cx="50" cy="50" r="44" stroke="var(--sf2)" stroke-width="8" fill="none"/>
-            <circle id="end-score-arc" cx="50" cy="50" r="44" stroke="var(--tl)" stroke-width="8" fill="none" stroke-dasharray="276.5" stroke-dashoffset="276.5" stroke-linecap="round" transform="rotate(-90,50,50)" style="transition:stroke-dashoffset 1s ease"/>
+            <circle cx="50" cy="50" r="44" stroke="var(--sf2)" stroke-width="8" fill="none"></circle>
+            <circle id="end-score-arc" cx="50" cy="50" r="44" stroke="var(--tl)" stroke-width="8" fill="none" stroke-dasharray="276.5" stroke-dashoffset="276.5" stroke-linecap="round" transform="rotate(-90,50,50)" style="transition:stroke-dashoffset 1s ease"></circle>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div id="end-score" style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--tl)">0</div><div style="font-size:10px;color:var(--mu)">pts</div></div>
         </div>
@@ -545,7 +540,7 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-</body>
+
 <script>
 
 
@@ -562,13 +557,13 @@ textarea.fi{resize:vertical;min-height:80px}
 // ── HARDCODED CONFIG (replaced by "Download Configured Site") ──
 // These placeholders are filled when admin clicks "Download Configured Site"
 // Upload that file to GitHub → works on ALL devices automatically
-var _HC_API_KEY      = ''; // KAVEER_PLACEHOLDER_APIKEY
-var _HC_AUTH_DOMAIN  = ''; // KAVEER_PLACEHOLDER_AUTHDOMAIN
-var _HC_PROJECT_ID   = ''; // KAVEER_PLACEHOLDER_PROJECTID
-var _HC_APP_ID       = ''; // KAVEER_PLACEHOLDER_APPID
-var _HC_BREVO_KEY    = ''; // KAVEER_PLACEHOLDER_BREVOKEY
-var _HC_BREVO_FROM   = ''; // KAVEER_PLACEHOLDER_BREVOFROM
-var _HC_BREVO_NAME   = ''; // KAVEER_PLACEHOLDER_BREVONAME
+var _HC_API_KEY      = 'AIzaSyCQ3s1E1Kb9DbZrQTcMkKBSvzyLxieM7cQ'; // configured
+var _HC_AUTH_DOMAIN  = 'kaveer-6f771.firebaseapp.com'; // configured
+var _HC_PROJECT_ID   = 'kaveer-6f771'; // configured
+var _HC_APP_ID       = '1:421590906831:web:f2cac514884b6d1b64c4ba'; // configured
+var _HC_BREVO_KEY    = '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'; // configured
+var _HC_BREVO_FROM   = 'kaveer.platform@gmail.com'; // configured
+var _HC_BREVO_NAME   = 'KAVEER'; // configured
 
 // FB_CONFIG uses hardcoded values if available, else empty
 var FB_CONFIG = {
@@ -3358,5 +3353,6 @@ function downloadConfiguredSite(){
 
 
 </script>
-</body>
-</html>
+
+
+<iframe ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: absolute; top: -100px; width: 1px; height: 1px;" tabindex="-1" vspace="0" width="100%" aria-hidden="true" id="I0_1777353374320" name="I0_1777353374320" src="https://kaveer-6f771.firebaseapp.com/__/auth/iframe?apiKey=AIzaSyCQ3s1E1Kb9DbZrQTcMkKBSvzyLxieM7cQ&amp;appName=kaveer-1777353358919&amp;v=10.12.0&amp;eid=p&amp;usegapi=1&amp;jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.en.HLcjcliCxoY.O%2Fd%3D1%2Frs%3DAHpOoo-EKlLcELGvY6Qdg_kTBmN3Ra8MLw%2Fm%3D__features__#id=I0_1777353374320&amp;_gfid=I0_1777353374320&amp;parent=https%3A%2F%2Fkaveerplatform.github.io&amp;pfname=&amp;rpctoken=67896646"></iframe><div id="mob-nav" style="display: none; position: fixed; bottom: 0px; left: 0px; right: 0px; height: 58px; background: var(--bg2); border-top: 1px solid var(--bd); z-index: 500; justify-content: space-around; align-items: center; padding: 0px 4px;"><button onclick="showAdmSec('overview',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">📊</span><span style="font-size:10px;font-weight:600">Overview</span></button><button onclick="showAdmSec('students',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">👥</span><span style="font-size:10px;font-weight:600">Users</span></button><button onclick="showAdmSec('videos',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">🎬</span><span style="font-size:10px;font-weight:600">Videos</span></button><button onclick="showAdmSec('requests',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">📥</span><span style="font-size:10px;font-weight:600">Requests</span></button><button onclick="showAdmSec('settings',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">⚙️</span><span style="font-size:10px;font-weight:600">Settings</span></button></div></body></html>
