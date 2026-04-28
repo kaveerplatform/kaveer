@@ -113,42 +113,62 @@ textarea.fi{resize:vertical;min-height:80px}
 .vtit{font-family:var(--fd);font-size:13px;font-weight:700;line-height:1.4;color:var(--wh);margin-bottom:6px}
 .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
 
-/* ── Player screen ─────────────────────────────────────────── */
-#s-player{background:var(--bg);position:fixed;inset:0;z-index:200;flex-direction:column;display:none}
-#s-player.on{display:flex}
-#player-top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--bd);flex-shrink:0}
-#yt-wrap{flex:1;position:relative;background:#000;min-height:0}
-#yt-box{position:relative;width:100%;padding-top:56.25%}
-#yt-player{position:absolute;inset:0;width:100%;height:100%}
-.yt-mask{position:absolute;background:transparent;z-index:5}
-.mask-top{top:0;left:0;right:0;height:60px}
-.mask-right{top:60px;right:0;width:80px;bottom:60px}
-.mask-logo{bottom:0;left:0;width:120px;height:50px}
-#player-bottom{padding:8px 16px;background:var(--bg2);border-top:1px solid var(--bd);flex-shrink:0}
-#seek-bar{width:100%;height:5px;background:var(--sf2);border-radius:100px;appearance:none;outline:none;cursor:pointer;margin-bottom:8px}
-#seek-bar::-webkit-slider-thumb{appearance:none;width:14px;height:14px;background:var(--tl);border-radius:50%}
-.pb-row{display:flex;align-items:center;gap:10px}
-.pb-ic{background:none;border:none;color:var(--wh);font-size:20px;cursor:pointer;padding:2px 5px}
-.time-lbl{font-size:12px;color:var(--mu);font-variant-numeric:tabular-nums}
-#ch-credit{font-size:10px;color:var(--mu2);text-align:center;padding:2px 0}
+/* ── Player screen — fullscreen immersive ─────────────────── */
+#s-player{background:#000;position:fixed;inset:0;z-index:200;display:none;overflow:hidden}
+#s-player.on{display:flex;flex-direction:column}
+#yt-wrap{flex:1;position:relative;overflow:hidden;background:#000}
+#yt-box{position:absolute;inset:0}
+#yt-player{width:100% !important;height:100% !important}
+#yt-player iframe{width:100% !important;height:100% !important;pointer-events:none}
 
-/* ── Question panel ────────────────────────────────────────── */
-#q-panel{position:absolute;right:0;top:0;bottom:0;width:0;background:var(--bg2);border-left:1px solid var(--bd);overflow:hidden;transition:width .3s cubic-bezier(.16,1,.3,1);z-index:10}
-#q-panel.open{width:min(420px,48vw)}
-#qp-inner{padding:16px;height:100%;overflow-y:auto}
-.qcard{}
-.qnum{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tl)}
-.qtxt{font-size:15px;font-weight:600;color:var(--wh);line-height:1.6;margin:10px 0 14px}
-.opts{}
-.opt{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid var(--bd2);border-radius:var(--r);cursor:pointer;margin-bottom:8px;transition:var(--trans)}
-.opt:hover{border-color:var(--tl);background:var(--tdim)}
-.opt.sel{border-color:var(--tl);background:var(--tdim)}
-.opt.correct{border-color:var(--tl);background:rgba(0,201,167,.15)}
-.opt.wrong{border-color:var(--ac);background:rgba(232,76,43,.1)}
-.okey{font-family:var(--fd);font-weight:800;color:var(--tl);min-width:22px;font-size:15px}
-.qa{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)}
-.timer-wrap{position:relative;width:46px;height:46px}
-.timer-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--tl)}
+/* Masks — cover YouTube UI elements */
+.yt-mask{position:absolute;z-index:7;background:#000;pointer-events:all;cursor:default}
+.mask-top{top:0;left:0;right:0;height:56px}        /* title bar */
+.mask-bottom-left{bottom:0;left:0;width:200px;height:40px}  /* logo + info */
+.mask-bottom-right{bottom:0;right:0;width:200px;height:40px} /* settings */
+.mask-right-edge{top:0;right:0;width:60px;height:100%}      /* sidebar */
+
+/* Controls */
+.pc-btn{background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;font-size:14px;padding:7px 10px;border-radius:8px;font-family:var(--fb);font-weight:600;transition:background .15s;white-space:nowrap}
+.pc-btn:hover{background:rgba(255,255,255,.2)}
+#player-top,#player-controls{transition:opacity .4s}
+#player-top.hidden,#player-controls.hidden{opacity:0;pointer-events:none}
+
+/* Seek bar */
+#seek-track{position:relative;height:5px;cursor:pointer;transition:height .15s}
+#seek-container:hover #seek-track{height:8px}
+#seek-container:hover #seek-thumb{transform:translate(-50%,-50%) scale(1.4) !important}
+
+/* Q dots on track */
+.qdot{position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;cursor:pointer;z-index:5;transition:transform .15s}
+.qdot:hover{transform:translate(-50%,-50%) scale(1.6) !important}
+
+/* Question overlay */
+#q-overlay{display:none}
+#q-overlay.on{display:flex}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Splash */
+#splash-screen.on{display:flex}
+
+/* Answer flash */
+.ans-flash{display:none;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600}
+.ans-flash.on{display:flex}
+.af-ok{background:rgba(0,201,167,.9);color:#0d0d14}
+.af-err{background:rgba(232,76,43,.9);color:#fff}
+
+/* End screen */
+#end-screen.on{display:flex}
+
+/* Progress bar range (hidden, used for drag) */
+#seek-range{position:absolute;inset:-8px 0;opacity:0;cursor:pointer;width:100%;height:calc(100% + 16px)}
+
+/* Mobile adjustments */
+@media(max-width:640px){
+  .pc-btn{font-size:13px;padding:6px 8px}
+  #pt-title{font-size:13px}
+  #q-card{border-radius:16px 16px 0 0;max-height:88vh}
+}
 
 /* ── Progress bar ──────────────────────────────────────────── */
 .cpb{width:100%;height:5px;background:var(--sf2);border-radius:100px;overflow:hidden}
@@ -413,63 +433,124 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ══ VIDEO PLAYER ══════════════════════════════════════════ -->
+<!-- ══ VIDEO PLAYER — Fullscreen immersive ═══════════════════ -->
 <div id="s-player">
-  <div id="player-top">
-    <button onclick="closePlayer()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:20px;padding:4px">✕</button>
-    <div style="flex:1;min-width:0">
-      <div id="pt-title" style="font-family:var(--fd);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading...</div>
-      <div id="pt-sub" style="font-size:11px;color:var(--mu)"></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-      <span id="pt-qc" class="badge bw">0 Q</span>
-      <span id="pt-sc" class="badge bt">0 pts</span>
-      <button onclick="toggleFS()" style="background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px">⛶</button>
-    </div>
-  </div>
-  <div id="yt-wrap" style="flex:1;display:flex;position:relative">
-    <div id="yt-box">
-      <div id="yt-player"></div>
-      <div class="yt-mask mask-top"></div>
-      <div class="yt-mask mask-right"></div>
-      <div class="yt-mask mask-logo"></div>
-    </div>
-    <div id="q-panel"><div id="qp-inner"></div></div>
-    <!-- Teacher toolbar -->
-    <div id="tc-toolbar" style="display:none;position:absolute;bottom:80px;right:14px;z-index:50;flex-direction:column;gap:8px"></div>
-  </div>
-  <div class="ans-flash" id="ans-flash"></div>
-  <div id="player-bottom">
-    <div id="seek-container">
-      <input type="range" id="seek-bar" min="0" max="100" value="0" oninput="onSeekInput(this.value)" onchange="onSeekChange(this.value)"/>
-      <div id="q-dots"></div>
-    </div>
-    <div class="pb-row">
-      <button class="pb-ic" onclick="seekRel(-10)">⏪</button>
-      <button class="pb-ic" id="play-btn" onclick="togglePlay()">▶</button>
-      <button class="pb-ic" onclick="seekRel(10)">⏩</button>
-      <button class="pb-ic" onclick="toggleMute()" id="mute-btn">🔊</button>
-      <span class="time-lbl"><span id="cur-t">0:00</span> / <span id="dur-t">0:00</span></span>
-      <div style="flex:1"></div>
-      <div id="ch-credit"></div>
-    </div>
-  </div>
-  <!-- End screen -->
-  <div id="end-screen" style="display:none;position:absolute;inset:0;background:rgba(13,13,20,.96);z-index:30;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px">
-    <div style="text-align:center;max-width:480px">
-      <div style="font-size:48px;margin-bottom:12px">🎉</div>
-      <h2 style="font-family:var(--fd);font-size:22px;margin-bottom:8px">Video Complete!</h2>
-      <div id="end-score" style="font-family:var(--fd);font-size:40px;font-weight:800;color:var(--tl);margin:14px 0">0 pts</div>
-      <p style="color:var(--mu);margin-bottom:20px">Great work! Keep going.</p>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-g" onclick="closePlayer()">← Back to Videos</button>
-        <button class="btn btn-t" onclick="loadNextVideo()">Next Video →</button>
+
+  <!-- SPLASH SCREEN (shown 5s before video) -->
+  <div id="splash-screen" style="display:none;position:absolute;inset:0;z-index:100;background:#000;align-items:center;justify-content:center;flex-direction:column">
+    <div id="splash-img-wrap" style="width:100%;height:100%;position:relative;overflow:hidden">
+      <img id="splash-img" src="" style="width:100%;height:100%;object-fit:cover;opacity:.7"/>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px">
+        <div class="klogo" style="font-size:clamp(28px,6vw,56px);justify-content:center;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.8)">KAV<span class="e">E</span>ER</div>
+        <div id="splash-title" style="font-family:var(--fd);font-size:clamp(16px,3vw,28px);font-weight:700;color:#fff;margin:16px 0 8px;text-shadow:0 2px 12px rgba(0,0,0,.9);max-width:600px;line-height:1.3"></div>
+        <div id="splash-topic" style="font-size:clamp(12px,1.8vw,16px);color:rgba(255,255,255,.7);margin-bottom:24px"></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="width:8px;height:8px;background:var(--tl);border-radius:50%;animation:pulse 1s infinite"></div>
+          <span style="color:rgba(255,255,255,.6);font-size:13px">Starting in <span id="splash-count">5</span>s</span>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- VIDEO AREA (fills entire screen) -->
+  <div id="yt-wrap">
+    <div id="yt-box">
+      <div id="yt-player"></div>
+      <!-- Masks to hide YouTube branding -->
+      <div class="yt-mask mask-top"></div>
+      <div class="yt-mask mask-bottom-left"></div>
+      <div class="yt-mask mask-bottom-right"></div>
+      <div class="yt-mask mask-right-edge"></div>
+      <!-- Click blocker - prevents clicking YouTube logo/title -->
+      <div id="yt-click-block" style="position:absolute;inset:0;z-index:6;cursor:pointer" onclick="toggleControls()"></div>
+    </div>
+
+    <!-- REVISION BADGE -->
+    <div id="revision-badge" style="display:none;position:absolute;top:12px;left:12px;z-index:30;background:rgba(247,163,37,.15);border:1px solid var(--ac2);border-radius:100px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--ac2);backdrop-filter:blur(8px)">📺 Revision Mode</div>
+
+    <!-- HEADER BAR (top, fades out) -->
+    <div id="player-top" style="position:absolute;top:0;left:0;right:0;z-index:20;padding:12px 14px 24px;background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent);transition:opacity .3s;display:flex;align-items:center;gap:10px">
+      <button onclick="closePlayer()" style="background:rgba(0,0,0,.5);border:none;color:#fff;cursor:pointer;font-size:18px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+      <div style="flex:1;min-width:0">
+        <div id="pt-title" style="font-family:var(--fd);font-size:clamp(13px,2vw,16px);font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,.8)">Loading...</div>
+        <div id="pt-sub" style="font-size:11px;color:rgba(255,255,255,.65);margin-top:2px"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <span id="pt-qc" style="background:rgba(247,163,37,.2);border:1px solid rgba(247,163,37,.4);color:var(--ac2);padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700">0 Q</span>
+        <span id="pt-sc" style="background:rgba(0,201,167,.15);border:1px solid rgba(0,201,167,.3);color:var(--tl);padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700">0 pts</span>
+      </div>
+    </div>
+
+    <!-- CONTROLS BAR (bottom, fades out) -->
+    <div id="player-controls" style="position:absolute;bottom:0;left:0;right:0;z-index:20;padding:24px 14px 12px;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);transition:opacity .3s">
+      <!-- Progress bar row -->
+      <div id="seek-container" style="position:relative;margin-bottom:10px;padding:6px 0;cursor:pointer" onclick="handleSeekClick(event)" onmousemove="handleSeekHover(event)" onmouseleave="hideSeekPreview()">
+        <div id="seek-track" style="height:5px;background:rgba(255,255,255,.2);border-radius:100px;position:relative;transition:height .15s" onmouseover="this.style.height='8px'" onmouseout="this.style.height='5px'">
+          <div id="seek-fill" style="height:100%;background:var(--tl);border-radius:100px;position:absolute;left:0;top:0;pointer-events:none"></div>
+          <div id="seek-watched" style="height:100%;background:rgba(255,255,255,.25);border-radius:100px;position:absolute;left:0;top:0;pointer-events:none"></div>
+          <div id="seek-thumb" style="width:14px;height:14px;background:var(--tl);border-radius:50%;position:absolute;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 3px rgba(0,201,167,.3);pointer-events:none;transition:transform .15s" onmouseover="this.style.transform='translate(-50%,-50%) scale(1.3)'"></div>
+          <div id="q-dots"></div>
+        </div>
+        <div id="seek-preview" style="display:none;position:absolute;bottom:20px;background:rgba(0,0,0,.8);color:#fff;padding:3px 7px;border-radius:5px;font-size:11px;transform:translateX(-50%);pointer-events:none"></div>
+      </div>
+      <!-- Buttons row -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="pc-btn" onclick="seekRel(-10)" title="Back 10s">⏮ 10s</button>
+        <button class="pc-btn" id="play-btn" onclick="togglePlay()" style="font-size:20px;width:40px;height:40px;background:rgba(255,255,255,.15)">▶</button>
+        <span style="font-size:12px;color:rgba(255,255,255,.8);font-variant-numeric:tabular-nums;white-space:nowrap"><span id="cur-t">0:00</span> / <span id="dur-t">0:00</span></span>
+        <div style="flex:1"></div>
+        <div id="ch-credit" style="font-size:10px;color:rgba(255,255,255,.4);text-align:center"></div>
+        <div style="flex:1"></div>
+        <button class="pc-btn" onclick="toggleMute()" id="mute-btn">🔊</button>
+        <button class="pc-btn" onclick="toggleFS()" id="fs-btn">⛶</button>
+      </div>
+    </div>
+
+    <!-- QUESTION OVERLAY (fullscreen, slides up) -->
+    <div id="q-overlay" style="display:none;position:absolute;inset:0;z-index:50;align-items:flex-end;justify-content:center">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px)"></div>
+      <div id="q-card" style="position:relative;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;background:linear-gradient(180deg,rgba(18,18,28,.97),rgba(13,13,20,.99));border-radius:20px 20px 0 0;padding:20px 18px 28px;animation:slideUp .35s cubic-bezier(.16,1,.3,1)">
+        <div id="qp-inner"></div>
+      </div>
+    </div>
+
+    <!-- ANS FLASH -->
+    <div class="ans-flash" id="ans-flash" style="position:absolute;top:60px;left:50%;transform:translateX(-50%);z-index:25;white-space:nowrap"></div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" style="display:none;position:absolute;inset:0;z-index:60;background:rgba(13,13,20,.96);align-items:center;justify-content:center;flex-direction:column;padding:20px;overflow-y:auto">
+      <div style="text-align:center;max-width:520px;width:100%">
+        <div style="font-size:48px;margin-bottom:10px">🎉</div>
+        <h2 style="font-family:var(--fd);font-size:clamp(18px,4vw,26px);margin-bottom:6px">Video Complete!</h2>
+        <div id="end-score-ring" style="width:100px;height:100px;margin:14px auto;position:relative">
+          <svg viewBox="0 0 100 100" width="100" height="100">
+            <circle cx="50" cy="50" r="44" stroke="var(--sf2)" stroke-width="8" fill="none"/>
+            <circle id="end-score-arc" cx="50" cy="50" r="44" stroke="var(--tl)" stroke-width="8" fill="none" stroke-dasharray="276.5" stroke-dashoffset="276.5" stroke-linecap="round" transform="rotate(-90,50,50)" style="transition:stroke-dashoffset 1s ease"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div id="end-score" style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--tl)">0</div><div style="font-size:10px;color:var(--mu)">pts</div></div>
+        </div>
+        <div id="end-links" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0"></div>
+        <div id="end-recommended" style="margin:14px 0;text-align:left"></div>
+        <div style="display:flex;gap:9px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-g" onclick="closePlayer()">← Back</button>
+          <button id="end-next-btn" class="btn btn-t" onclick="loadNextVideo()" style="display:none">Next Video →</button>
+          <button class="btn btn-w" onclick="shareVideo()" style="font-size:13px">🔗 Share this video</button>
+        </div>
+        <div style="margin-top:12px;font-size:10px;color:var(--mu2);line-height:1.5">Content played via KAVEER for educational purposes. If you are the creator and want removal, email us.</div>
+      </div>
+    </div>
+
+    <!-- TEACHER TOOLBAR -->
+    <div id="tc-toolbar" style="display:none;position:absolute;bottom:90px;right:14px;z-index:40;flex-direction:column;gap:8px"></div>
+  </div>
 </div>
 
+</body>
 <script>
+
+
+
+
 // ═══════════════════════════════════════════════════════════════
 // KAVEER v8 — Complete JavaScript
 // Real-time Firestore database — works across ALL devices
@@ -1673,168 +1754,6 @@ async function saveProgress(){
   ST.progress[vid.id]=data;
 }
 
-function startTrack(){
-  ST.trackInt=setInterval(function(){
-    if(!ST.ytPlayer||!ST.isPlaying) return;
-    try{
-      var t=ST.ytPlayer.getCurrentTime()||0;
-      var d=ST.ytPlayer.getDuration()||0;
-      ST.curT=t; ST.dur=d;
-      if(ST.seekMgr) ST.seekMgr.update(t);
-      // Update UI
-      var sb=$('seek-bar'); if(sb&&d>0) sb.value=(t/d)*100;
-      var ct=$('cur-t'); if(ct) ct.textContent=fmt(t);
-      var dt=$('dur-t'); if(dt) dt.textContent=fmt(d);
-      // Check questions
-      checkQTriggers(t);
-      // Auto-save every 15 seconds
-      if(t-ST._lastSave>15){ ST._lastSave=t; saveProgress(); }
-    }catch(e){}
-  },500);
-}
-function stopTrack(){ clearInterval(ST.trackInt); ST.trackInt=null; }
-
-// ── Open video player ─────────────────────────────────────────
-async function openPlayer(vidId){
-  var v=ST.videos.find(function(v){return v.id===vidId;});
-  if(!v){ toast('Video not found','err'); return; }
-  
-  var saved=ST.progress[v.id]||null;
-  ST.curVid=v;
-  ST.answeredQs=saved?JSON.parse(JSON.stringify(saved.answeredQs||{})):{};
-  ST.scores=saved?JSON.parse(JSON.stringify(saved.scores||{})):{};
-  ST.activeQ=null; ST.lastChk=-1; ST.seenNotes={}; ST.timedOut=false; ST._lastSave=-1;
-  ST.seekMgr=createSeekMgr(v.dur||3600);
-  if(saved) ST.seekMgr.maxWatched=saved.maxWatched||0;
-
-  // Load questions
-  var qs=await loadQuestions(v.id);
-
-  // Update UI
-  if($('pt-title'))$('pt-title').textContent=v.title;
-  if($('pt-sub'))$('pt-sub').textContent=v.topic+' · '+(v.channel||'');
-  if($('pt-qc'))$('pt-qc').textContent=qs.length+' Q';
-  var pts=Object.values(ST.scores).reduce(function(a,s){return a+s;},0);
-  if($('pt-sc'))$('pt-sc').textContent='🏆 '+pts+' pts';
-  if($('ch-credit'))$('ch-credit').textContent=(v.channel||'')+(v.channel?' — played via KAVEER':'played via KAVEER');
-  if($('end-screen'))$('end-screen').style.display='none';
-  if($('ans-flash'))$('ans-flash').style.display='none';
-  
-  closeQPanel(); exitFS();
-  $('s-player').classList.add('on');
-
-  // Resume toast
-  if(saved&&saved.resumeAt>10){
-    var f=$('ans-flash');
-    if(f){
-      f.className='ans-flash af-ok';
-      f.innerHTML='<span>📌</span><span>Resuming from <strong>'+fmt(saved.resumeAt)+'</strong> · Can seek up to <strong>'+fmt(saved.maxWatched)+'</strong></span>';
-      f.style.display='flex'; clearTimeout(f._t); f._t=setTimeout(function(){f.style.display='none';},5000);
-    }
-  }
-
-  initYT(v.ytId,saved?saved.resumeAt:0);
-  renderQDots(qs);
-  
-  // Show teacher toolbar if teacher
-  if(ST.user&&ST.user.role==='teacher') showTeacherToolbar(v.id);
-  else { var tb=$('tc-toolbar'); if(tb)tb.style.display='none'; }
-}
-
-function closePlayer(){
-  stopTrack();
-  clearInterval(ST.qTimer);
-  saveProgress();
-  if(ST.ytPlayer){ try{ST.ytPlayer.pauseVideo();}catch(e){} var p=ST.ytPlayer; setTimeout(function(){try{p.destroy();}catch(e){}},200); ST.ytPlayer=null; }
-  var tb=$('tc-toolbar'); if(tb)tb.style.display='none';
-  closeQPanel();
-  ST.curVid=null;
-  $('s-player').classList.remove('on');
-  if($('yt-player'))$('yt-player').innerHTML='';
-}
-
-function loadNextVideo(){
-  if(!ST.curVid) return;
-  var idx=ST.videos.findIndex(function(v){return v.id===ST.curVid.id;});
-  if(idx<ST.videos.length-1){ closePlayer(); openPlayer(ST.videos[idx+1].id); }
-  else{ closePlayer(); toast('You\'ve completed all videos! 🎉'); }
-}
-
-// ── YouTube IFrame API ────────────────────────────────────────
-function initYT(ytId,startTime){
-  var container=$('yt-player');
-  if(!container) return;
-  container.innerHTML='<div id="yt-iframe"></div>';
-  stopTrack();
-  if(ST.ytPlayer){ try{ST.ytPlayer.destroy();}catch(e){} ST.ytPlayer=null; }
-  if(window.YT&&window.YT.Player){
-    createYT(ytId,startTime||0);
-  }else{
-    window._pendingYT={ytId,startTime};
-    if(!document.querySelector('script[src*="youtube.com/iframe_api"]')){
-      var s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
-    }
-  }
-}
-
-window.onYouTubeIframeAPIReady=function(){
-  if(window._pendingYT){ createYT(window._pendingYT.ytId,window._pendingYT.startTime); window._pendingYT=null; }
-};
-
-function createYT(ytId,start){
-  try{
-    ST.ytPlayer=new YT.Player('yt-iframe',{
-      videoId:ytId,
-      playerVars:{
-        start:Math.floor(start)||0, autoplay:1,
-        controls:0, modestbranding:1, rel:0, fs:0,
-        iv_load_policy:3, disablekb:1,
-      },
-      events:{
-        onReady:function(e){ e.target.playVideo(); ST.isPlaying=true; startTrack(); },
-        onStateChange:function(e){
-          var s=e.data;
-          if(s===YT.PlayerState.PLAYING){ ST.isPlaying=true; $('play-btn').textContent='⏸'; startTrack(); }
-          else if(s===YT.PlayerState.PAUSED||s===YT.PlayerState.BUFFERING){ ST.isPlaying=false; $('play-btn').textContent='▶'; }
-          else if(s===YT.PlayerState.ENDED){ ST.isPlaying=false; stopTrack(); saveProgress(); showEndScreen(); }
-        },
-        onError:function(e){
-          var ytb=$('yt-box');
-          if(ytb){
-            var old=ytb.querySelector('.yt-err-ov'); if(old)old.remove();
-            var d=document.createElement('div');
-            d.className='yt-err-ov';
-            d.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg2);z-index:20';
-            d.innerHTML='<div style="font-size:36px;margin-bottom:8px">⚠️</div><p style="color:var(--mu)">Video unavailable. It may be restricted in your region.</p><a href="https://youtube.com/watch?v='+ytId+'" target="_blank" class="btn btn-t" style="margin-top:12px">Watch on YouTube</a>';
-            ytb.appendChild(d);
-          }
-        }
-      }
-    });
-  }catch(e){ console.error('YT player error:',e); }
-}
-
-// ── Player controls ───────────────────────────────────────────
-function togglePlay(){
-  if(!ST.ytPlayer) return;
-  if(ST.isPlaying) ST.ytPlayer.pauseVideo();
-  else ST.ytPlayer.playVideo();
-}
-function toggleMute(){
-  if(!ST.ytPlayer) return;
-  ST.muted=!ST.muted;
-  if(ST.muted) ST.ytPlayer.mute(); else ST.ytPlayer.unMute();
-  $('mute-btn').textContent=ST.muted?'🔇':'🔊';
-}
-function seekRel(delta){
-  if(!ST.ytPlayer) return;
-  var t=(ST.ytPlayer.getCurrentTime()||0)+delta;
-  if(ST.user&&ST.user.role==='student'&&ST.seekMgr){
-    var res=ST.seekMgr.canSeekTo(t,ST.curT);
-    if(!res.ok){ toast('Can\'t skip ahead — watch to that point first','err'); return; }
-  }
-  ST.ytPlayer.seekTo(Math.max(0,t));
-}
 function onSeekInput(val){ if($('cur-t')&&ST.dur) $('cur-t').textContent=fmt((val/100)*ST.dur); }
 function onSeekChange(val){
   if(!ST.ytPlayer||!ST.dur) return;
@@ -1848,58 +1767,6 @@ function onSeekChange(val){
   }
   ST.ytPlayer.seekTo(target);
 }
-function toggleFS(){
-  if(!ST.isFullscreen){
-    var el=$('s-player');
-    if(el.requestFullscreen) el.requestFullscreen();
-    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    ST.isFullscreen=true; $('s-player').classList.add('fs-mode');
-  }else{ exitFS(); }
-}
-function exitFS(){
-  try{ if(document.exitFullscreen) document.exitFullscreen(); else if(document.webkitExitFullscreen) document.webkitExitFullscreen(); }catch(e){}
-  ST.isFullscreen=false; if($('s-player')) $('s-player').classList.remove('fs-mode');
-}
-document.addEventListener('fullscreenchange',function(){ if(!document.fullscreenElement&&ST.isFullscreen){ST.isFullscreen=false;if($('s-player'))$('s-player').classList.remove('fs-mode');} });
-
-// ── Question dots on seeker ───────────────────────────────────
-function renderQDots(qs){
-  var container=$('q-dots'); if(!container) return;
-  container.innerHTML='';
-  if(!qs||!qs.length||!ST.curVid||!ST.curVid.dur) return;
-  qs.forEach(function(q){
-    var dot=document.createElement('div');
-    dot.className='qdot';
-    dot.style.left=((q.ts/ST.curVid.dur)*100)+'%';
-    dot.title='Q at '+fmt(q.ts);
-    dot.style.background=ST.answeredQs[q.id]?'var(--tl)':'var(--ac2)';
-    container.appendChild(dot);
-  });
-}
-
-// ── Question triggers ─────────────────────────────────────────
-function checkQTriggers(t){
-  var qs=ST.questions[ST.curVid?ST.curVid.id:'']||[];
-  for(var i=0;i<qs.length;i++){
-    var q=qs[i];
-    if(Math.abs(t-q.ts)<1&&!ST.answeredQs[q.id]&&ST.lastChk!==q.id){
-      ST.lastChk=q.id;
-      if(ST.ytPlayer) ST.ytPlayer.pauseVideo();
-      showQuestion(q);
-      return;
-    }
-  }
-}
-
-// ── Show MCQ question ─────────────────────────────────────────
-function showQuestion(q){
-  ST.activeQ=q; ST.timedOut=false; ST.selOpt=null;
-  ST.qTL=30; clearInterval(ST.qTimer);
-  openQPanel();
-  renderQCard(q);
-  startQTimer();
-}
-
 function renderQCard(q){
   var qs=ST.questions[ST.curVid?ST.curVid.id:'']||[];
   var qi=qs.findIndex(function(x){return x.id===q.id;})+1;
@@ -1930,111 +1797,9 @@ function renderQCard(q){
   +'</div>';
 }
 
-function selOpt(i){
-  if(ST.answeredQs[ST.activeQ&&ST.activeQ.id]) return;
-  ST.selOpt=i;
-  document.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel');});
-  var el=document.getElementById('qo'+i); if(el) el.classList.add('sel');
-  var sub=$('q-sub'); if(sub){sub.style.opacity='1';sub.style.pointerEvents='auto';}
-}
-
-function startQTimer(){
-  var total=ST.qTL;
-  ST.qTimer=setInterval(function(){
-    ST.qTL--;
-    var tv=$('q-tv'); if(tv) tv.textContent=ST.qTL;
-    var tc=$('q-tc'); if(tc) tc.style.strokeDashoffset=(132-(132*(ST.qTL/total)));
-    if(tv&&ST.qTL<=10) tv.style.color='var(--ac)';
-    if(ST.qTL<=0){ clearInterval(ST.qTimer); timeoutQ(); }
-  },1000);
-}
-
-function timeoutQ(){
-  ST.timedOut=true;
-  var sub=$('q-sub'); if(sub){sub.textContent='See Answer';sub.style.opacity='1';sub.style.pointerEvents='auto';sub.onclick=function(){subQ();};}
-  var tv=$('q-tv'); if(tv) tv.textContent='⏰';
-  toast('Time\'s up! Click See Answer to continue.','inf');
-}
-
-function subQ(){
-  if(!ST.activeQ) return;
-  clearInterval(ST.qTimer);
-  var q=ST.activeQ;
-  var correct=(ST.selOpt!==null&&!ST.timedOut)&&ST.selOpt===q.correct;
-  ST.answeredQs[q.id]=correct;
-  if(correct) ST.scores[q.id]=q.pts||10;
-
-  // Mark correct/wrong options
-  document.querySelectorAll('.opt').forEach(function(o){o.onclick=null;});
-  var corEl=document.getElementById('qo'+q.correct); if(corEl) corEl.classList.add('correct');
-  if(!correct&&ST.selOpt!==null){ var wrEl=document.getElementById('qo'+ST.selOpt); if(wrEl) wrEl.classList.add('wrong'); }
-
-  // Show explanation
-  var fb=$('q-fb');
-  if(fb) fb.innerHTML='<div style="margin-top:12px;padding:10px 12px;background:'+(correct?'rgba(0,201,167,.1)':'rgba(232,76,43,.08)')+';border-radius:var(--r);border-left:3px solid '+(correct?'var(--tl)':'var(--ac)')+'">'
-    +'<div style="font-size:13px;font-weight:700;color:'+(correct?'var(--tl)':'var(--ac)')+';margin-bottom:4px">'+(correct?'✓ Correct! +'+q.pts+' pts':'✗ '+(ST.timedOut?'Time\'s up!':'Incorrect'))+'</div>'
-    +(q.exp?'<p style="font-size:12px;color:var(--mu);line-height:1.6">'+q.exp+'</p>':'')
-  +'</div>';
-
-  // Show XP popup
-  if(correct){
-    var popup=document.createElement('div');
-    popup.style.cssText='position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);background:var(--tl);color:#0d0d14;padding:12px 24px;border-radius:100px;font-family:var(--fd);font-size:18px;font-weight:800;z-index:9000;animation:up .4s cubic-bezier(.16,1,.3,1)';
-    popup.textContent='+'+q.pts+' XP! 🎉';
-    document.body.appendChild(popup);
-    setTimeout(function(){popup.remove();},2000);
-  }
-
-  // Update dots and save
-  renderQDots(ST.questions[q.videoId]||[]);
-  saveProgress();
-  var pts=Object.values(ST.scores).reduce(function(a,s){return a+s;},0);
-  if($('pt-sc'))$('pt-sc').textContent='🏆 '+pts+' pts';
-
-  // Change submit to Continue
-  var sub=$('q-sub');
-  if(sub){sub.textContent='Continue →';sub.style.opacity='1';sub.style.pointerEvents='auto';sub.onclick=function(){resumeAfterQ();};}
-}
-
-function skipQ(){
-  clearInterval(ST.qTimer);
-  ST.answeredQs[ST.activeQ.id]=false;
-  saveProgress();
-  resumeAfterQ();
-}
-
-function resumeAfterQ(){
-  closeQPanel();
-  ST.activeQ=null;
-  if(ST.ytPlayer) ST.ytPlayer.playVideo();
-}
-
 function openQPanel(){ var p=$('q-panel'); if(p) p.classList.add('open'); var w=$('yt-wrap'); if(w) w.style.flexDirection='row'; }
 function closeQPanel(){ var p=$('q-panel'); if(p){ p.classList.remove('open'); var i=$('qp-inner'); if(i)i.innerHTML=''; } }
 
-function showEndScreen(){
-  var pts=Object.values(ST.scores).reduce(function(a,s){return a+s;},0);
-  var es=$('end-screen'); if(!es)return;
-  var sc=$('end-score'); if(sc) sc.textContent=pts+' pts';
-  es.style.display='flex';
-}
-
-// ── Teacher toolbar in player ─────────────────────────────────
-function showTeacherToolbar(vidId){
-  var tb=$('tc-toolbar'); if(!tb)return;
-  var qs=(ST.questions[vidId]||[]).length;
-  tb.style.display='flex';
-  tb.innerHTML='<button onclick="createQAtTime(\''+vidId+'\')" style="display:flex;align-items:center;gap:7px;padding:9px 14px;background:var(--tl);color:var(--bg);border:none;border-radius:var(--r);cursor:pointer;font-weight:700;font-size:13px;white-space:nowrap;box-shadow:0 4px 16px rgba(0,201,167,.35)">❓ Add Q at this Time</button>'
-    +'<button onclick="openQEditor(\''+vidId+'\')" style="display:flex;align-items:center;gap:7px;padding:9px 14px;background:rgba(13,13,20,.9);color:var(--wh);border:1px solid var(--bd2);border-radius:var(--r);cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap">✏️ Edit All ('+qs+')</button>';
-}
-
-function createQAtTime(vidId){
-  var t=0; if(ST.ytPlayer&&ST.ytPlayer.getCurrentTime) t=Math.floor(ST.ytPlayer.getCurrentTime()||0);
-  if(ST.ytPlayer) ST.ytPlayer.pauseVideo();
-  openQForm(vidId,null,null,t);
-}
-
-// ── MCQ Question Form ─────────────────────────────────────────
 function openQForm(vidId,editId,existingQ,presetTs){
   var isEdit=!!(editId&&existingQ);
   var ts=presetTs!==undefined?presetTs:(existingQ?existingQ.ts:60);
@@ -2279,6 +2044,9 @@ function openAddVid(editId){
     +'</div>'
     +'<div class="fg"><label class="fl">Stream / Subject</label><input class="fi" id="av-subj" value="'+(existing?san(existing.subj||''):'')+'"/></div>'
     +'<div class="fg"><label class="fl">Notes Link</label><input class="fi" id="av-notes" type="url" value="'+(existing?san(existing.notesLink||''):'')+'"/></div>'
+    +'<div class="fg"><label class="fl">Quiz Link 1</label><input class="fi" id="av-quiz" type="url" value="'+(existing?san(existing.quizLink||''):'')+'"/></div>'
+    +'<div class="fg"><label class="fl">Quiz Link 2</label><input class="fi" id="av-quiz2" type="url" value="'+(existing?san(existing.quiz2||''):'')+'"/></div>'
+    +'<div class="fg"><label class="fl">Splash Image URL</label><input class="fi" id="av-splash" type="url" value="'+(existing?san(existing.splashImg||''):'')+'"/></div>'
     +'<div style="display:flex;gap:9px;margin-top:4px"><button class="btn btn-g full" onclick="document.getElementById(\'add-vid-mo\').remove()">Cancel</button><button class="btn btn-t full" onclick="saveVideo()">'+(editId?'Update':'Add Video →')+'</button></div>'
   +'</div>';
   document.body.appendChild(mo);
@@ -2307,7 +2075,7 @@ async function saveVideo(){
   var editId=mo?mo.dataset.editId:'';
   if(!title||!topic){toast('Title and topic are required','err');return;}
   if(editId){
-    await fsUpdate('videos',editId,{title,topic,channel,course,subj,notesLink:notes,tags:[topic,subj].filter(Boolean)});
+    await fsUpdate('videos',editId,{title,topic,channel,course,subj,notesLink:notes,quizLink:sanR(($("av-quiz")||{value:""}).value).trim(),quiz2:sanR(($("av-quiz2")||{value:""}).value).trim(),splashImg:sanR(($("av-splash")||{value:""}).value).trim(),tags:[topic,subj].filter(Boolean)});
     toast('"'+title+'" updated!');
   }else{
     var url=sanR(($('av-url')||{value:''}).value);
@@ -2407,15 +2175,6 @@ async function expStu(){
   var a=document.createElement('a');a.href=url;a.download='KAVEER_students_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
   setTimeout(function(){URL.revokeObjectURL(url);},1000);
   toast('Exported!');
-}
-
-function tcReports(){
-  var students=ST.users.filter(function(u){return u.role==='student';});
-  return '<h2 style="font-family:var(--fd);margin-bottom:14px">Student Reports</h2>'
-    +'<div class="info-box" style="margin-bottom:14px">Progress updates in real-time as students watch videos.</div>'
-    +'<div class="tw"><table><thead><tr><th>Student</th><th>Videos Watched</th><th>Profile %</th></tr></thead><tbody>'
-    +students.map(function(s){return '<tr><td>'+s.name+'</td><td>'+(Object.keys(ST.progress||{}).filter(function(k){return k.startsWith(s.id+'_');}).length)+'</td><td>'+Math.round([s.wa,s.college,s.branch,s.objective].filter(Boolean).length/4*100)+'%</td></tr>';}).join('')
-    +'</tbody></table></div>';
 }
 
 function tcRequests(){return '<h2 style="font-family:var(--fd);margin-bottom:14px">Topic Requests</h2><div class="box"><div class="boxt">By demand</div>'+(TOPIC_REQUESTS_CACHE.slice().sort(function(a,b){return(b.count||0)-(a.count||0);}).map(function(r){return '<div class="srow"><span style="font-size:13px;font-weight:600">'+r.topic+'</span><span class="badge bw">'+r.count+' votes</span></div>';}).join('')||'<p style="color:var(--mu)">No requests yet.</p>')+'</div>';}
@@ -2586,18 +2345,28 @@ async function saveFirebaseCfg(){
   var appId=sanR(($('fb-appid')||{value:''}).value).trim();
   if(!apiKey||!authDomain||!projectId){toast('API Key, Auth Domain and Project ID required','err');return;}
   var cfg={apiKey,authDomain,projectId,appId};
-  await saveSettings({fbConfig:cfg});
+  // Save to Firestore (if already connected)
+  if(db){ try{ await saveSettings({fbConfig:cfg}); }catch(e){} }
+  // ALSO save to localStorage — this is the bootstrap for new devices
+  localStorage.setItem('kv_fb_bootstrap', JSON.stringify(cfg));
   FB_CONFIG=cfg;
-  if(initFirebase(cfg))toast('Firebase configured! Google Sign-In active. Reload to apply.');
-  else toast('Saved — reload page to activate.','inf');
+  if(initFirebase(cfg)){
+    // Now Firebase is running — also save to Firestore
+    try{ await saveSettings({fbConfig:cfg}); }catch(e){}
+    toast('Firebase configured! ✅ Works on ALL devices now. Reload to apply.');
+  }else{
+    toast('Saved locally — reload page to activate.','inf');
+  }
 }
 
 async function saveBrevoSettings(){
   BREVO_KEY=sanR(($('brevo-k')||{value:''}).value).trim();
   BREVO_FROM=sanR(($('brevo-f')||{value:''}).value).trim();
   BREVO_NAME=sanR(($('brevo-n')||{value:''}).value).trim()||'KAVEER';
-  await saveSettings({brevoKey:BREVO_KEY,brevoFrom:BREVO_FROM,brevoName:BREVO_NAME});
-  toast('Email settings saved!');
+  // Save to localStorage so it works across devices
+  localStorage.setItem('kv_brevo_bootstrap',JSON.stringify({key:BREVO_KEY,from:BREVO_FROM,name:BREVO_NAME}));
+  if(db){ try{ await saveSettings({brevoKey:BREVO_KEY,brevoFrom:BREVO_FROM,brevoName:BREVO_NAME}); }catch(e){} }
+  toast('Email settings saved! ✅ All devices will use this automatically.');
 }
 
 async function saveSocialLinks(){
@@ -2637,7 +2406,7 @@ function initMobileNav(){
   var nav=document.createElement('div');nav.id='mob-nav';
   nav.style.cssText='display:none;position:fixed;bottom:0;left:0;right:0;height:58px;background:var(--bg2);border-top:1px solid var(--bd);z-index:500;justify-content:space-around;align-items:center;padding:0 4px';
   if(ST.user.role==='student'){
-    nav.innerHTML=[{icon:'🏠',label:'Home',sec:'home'},{icon:'📚',label:'Courses',sec:'courses'},{icon:'🎬',label:'Videos',sec:'videos'},{icon:'📊',label:'Stats',sec:'analytics'},{icon:'👤',label:'Profile',sec:'profile'}].map(function(tab){return '<button id="ms-'+tab.sec+'" onclick="showSec(\''+tab.sec+'\',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">'+tab.icon+'</span><span style="font-size:10px;font-weight:600">'+tab.label+'</span></button>';}).join('');
+    nav.innerHTML=[{icon:'🏠',label:'Home',sec:'home'},{icon:'🎬',label:'Videos',sec:'videos'},{icon:'📊',label:'Stats',sec:'analytics'},{icon:'👤',label:'Profile',sec:'profile'}].map(function(tab){return '<button id="ms-'+tab.sec+'" onclick="showSec(\''+tab.sec+'\',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">'+tab.icon+'</span><span style="font-size:10px;font-weight:600">'+tab.label+'</span></button>';}).join('')+'<button onclick="logout()" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:rgba(232,76,43,.7);flex:1;font-family:var(--fb)"><span style="font-size:20px">🚪</span><span style="font-size:10px;font-weight:600">Logout</span></button>';
   }else if(ST.user.role==='teacher'){
     nav.innerHTML=[{icon:'📊',label:'Overview',sec:'overview'},{icon:'🎬',label:'Videos',sec:'videos'},{icon:'👥',label:'Students',sec:'students'},{icon:'📈',label:'Reports',sec:'reports'},{icon:'💡',label:'Requests',sec:'requests'}].map(function(tab){return '<button onclick="showTcSec(\''+tab.sec+'\',null)" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;background:none;border:none;cursor:pointer;color:var(--mu);flex:1;font-family:var(--fb)"><span style="font-size:20px">'+tab.icon+'</span><span style="font-size:10px;font-weight:600">'+tab.label+'</span></button>';}).join('');
   }else if(ST.user.role==='admin'){
@@ -2664,6 +2433,38 @@ document.addEventListener('keydown',function(e){
 
 // ── Page Init ─────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',function(){
+  // ── BOOTSTRAP: load Firebase config from localStorage FIRST ──
+  // This makes Firebase work on ANY device without manual setup
+  (function(){
+    try{
+      var stored=localStorage.getItem('kv_fb_bootstrap');
+      if(stored){
+        var cfg=JSON.parse(stored);
+        // Also load Brevo bootstrap
+      try{
+        var brev=localStorage.getItem('kv_brevo_bootstrap');
+        if(brev){ var b=JSON.parse(brev); BREVO_KEY=b.key||''; BREVO_FROM=b.from||''; BREVO_NAME=b.name||'KAVEER'; }
+      }catch(e){}
+      if(cfg&&cfg.apiKey&&cfg.authDomain&&cfg.projectId){
+          if(initFirebase(cfg)){
+            console.log('[KAVEER] Firebase auto-initialised from localStorage bootstrap');
+            // After Firebase is ready, load full settings from Firestore
+            setTimeout(function(){
+              checkFirebaseRedirectResult();
+              loadSettings().then(function(){
+                // If Firestore has updated config, refresh bootstrap
+                if(FB_CONFIG&&FB_CONFIG.apiKey){
+                  localStorage.setItem('kv_fb_bootstrap',JSON.stringify(FB_CONFIG));
+                }
+              });
+            },500);
+          }
+        }
+      }
+    }catch(e){ console.warn('[KAVEER] Bootstrap failed:',e); }
+  })();
+
+  // ── Render UI ──
   var lp=document.getElementById('landing-page');
   if(lp)lp.innerHTML=renderLanding();
   var si=document.getElementById('r-s1-inner');
@@ -2673,8 +2474,787 @@ window.addEventListener('DOMContentLoaded',function(){
     var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.async=true;document.head.appendChild(s);
   }
   loadTopicRequests();
+  // Check for direct video link
+  setTimeout(checkVideoDeepLink,1000);
 });
 window.onerror=function(msg,src,line){console.error('[KAVEER v8] Error at line',line+':',msg);return false;};
+
+// ── PLAYER REDESIGN ──
+// ═══════════════════════════════════════════════════════════════
+// KAVEER v8 — Player Redesign + All New Features
+// ═══════════════════════════════════════════════════════════════
+
+// ── Controls auto-hide ────────────────────────────────────────
+var _ctrlTimer = null;
+function showControls(){
+  var top = document.getElementById('player-top');
+  var ctrl = document.getElementById('player-controls');
+  if(top) top.classList.remove('hidden');
+  if(ctrl) ctrl.classList.remove('hidden');
+  clearTimeout(_ctrlTimer);
+  _ctrlTimer = setTimeout(function(){
+    if(ST.isPlaying){
+      if(top) top.classList.add('hidden');
+      if(ctrl) ctrl.classList.add('hidden');
+    }
+  }, 3000);
+}
+function toggleControls(){
+  var ctrl = document.getElementById('player-controls');
+  if(ctrl && ctrl.classList.contains('hidden')) showControls();
+  else {
+    var top = document.getElementById('player-top');
+    if(top) top.classList.add('hidden');
+    if(ctrl) ctrl.classList.add('hidden');
+    clearTimeout(_ctrlTimer);
+  }
+}
+
+// ── Splash screen ─────────────────────────────────────────────
+var _splashInterval = null;
+function showSplash(vid, onDone){
+  var splash = document.getElementById('splash-screen');
+  var img    = document.getElementById('splash-img');
+  var title  = document.getElementById('splash-title');
+  var topic  = document.getElementById('splash-topic');
+  var count  = document.getElementById('splash-count');
+  if(!splash){ onDone(); return; }
+
+  // Set content
+  if(title) title.textContent = vid.title || '';
+  if(topic) topic.textContent = vid.topic + (vid.channel ? ' · ' + vid.channel : '');
+  if(img && vid.splashImg){ img.src = vid.splashImg; img.style.display='block'; }
+  else if(img){ img.src = ''; img.style.display='none'; }
+
+  splash.classList.add('on');
+  var secs = 5;
+  if(count) count.textContent = secs;
+  _splashInterval = setInterval(function(){
+    secs--;
+    if(count) count.textContent = secs;
+    if(secs <= 0){
+      clearInterval(_splashInterval);
+      splash.classList.remove('on');
+      onDone();
+    }
+  }, 1000);
+
+  // Click to skip
+  splash.onclick = function(){
+    clearInterval(_splashInterval);
+    splash.classList.remove('on');
+    splash.onclick = null;
+    onDone();
+  };
+}
+
+// ── Seek: custom click-based (no range input) ─────────────────
+function handleSeekClick(e){
+  var track = document.getElementById('seek-track');
+  if(!track || !ST.dur) return;
+  var rect = track.getBoundingClientRect();
+  var pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  var target = pct * ST.dur;
+
+  // Block student seeking ahead
+  if(ST.user && ST.user.role === 'student' && ST.seekMgr){
+    var res = ST.seekMgr.canSeekTo(target, ST.curT);
+    if(!res.ok){
+      var max = res.max;
+      target = max;
+      showFlash('⚠ Can\'t skip ahead — watch to unlock', false);
+    }
+  }
+  if(ST.ytPlayer) ST.ytPlayer.seekTo(target, true);
+}
+
+function handleSeekHover(e){
+  var track   = document.getElementById('seek-track');
+  var preview = document.getElementById('seek-preview');
+  if(!track || !preview || !ST.dur) return;
+  var rect = track.getBoundingClientRect();
+  var pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  preview.style.display = 'block';
+  preview.style.left    = (pct * 100) + '%';
+  preview.textContent   = fmt(pct * ST.dur);
+}
+function hideSeekPreview(){
+  var p = document.getElementById('seek-preview'); if(p) p.style.display='none';
+}
+
+function updateSeekUI(){
+  if(!ST.dur) return;
+  var fill    = document.getElementById('seek-fill');
+  var watched = document.getElementById('seek-watched');
+  var thumb   = document.getElementById('seek-thumb');
+  var pct     = ST.curT / ST.dur;
+  var maxPct  = ST.seekMgr ? ST.seekMgr.maxWatched / ST.dur : pct;
+  if(fill)    fill.style.width    = (pct * 100) + '%';
+  if(watched) watched.style.width = (maxPct * 100) + '%';
+  if(thumb)   thumb.style.left    = (pct * 100) + '%';
+  var ct = document.getElementById('cur-t'); if(ct) ct.textContent = fmt(ST.curT);
+  var dt = document.getElementById('dur-t'); if(dt) dt.textContent = fmt(ST.dur);
+}
+
+// ── Q dots ────────────────────────────────────────────────────
+function renderQDots(qs){
+  var container = document.getElementById('q-dots');
+  if(!container || !qs) return;
+  container.innerHTML = '';
+  if(!ST.curVid || !ST.dur) return;
+  qs.forEach(function(q){
+    var pct = (q.ts / ST.dur) * 100;
+    var dot = document.createElement('div');
+    dot.className = 'qdot';
+    dot.style.cssText = 'left:'+pct+'%;width:10px;height:10px;background:'
+      + (ST.answeredQs[q.id] === true  ? 'var(--tl)'  :
+         ST.answeredQs[q.id] === false ? 'rgba(232,76,43,.8)' : 'var(--ac2)')
+      + ';box-shadow:0 0 6px rgba(0,0,0,.6)';
+    dot.title = 'Q at ' + fmt(q.ts);
+    dot.onclick = function(e){ e.stopPropagation(); };
+    container.appendChild(dot);
+  });
+}
+
+// ── Flash message ─────────────────────────────────────────────
+function showFlash(msg, ok){
+  var f = document.getElementById('ans-flash'); if(!f) return;
+  f.className = 'ans-flash on ' + (ok ? 'af-ok' : 'af-err');
+  f.innerHTML = (ok ? '✓ ' : '⚠ ') + msg;
+  clearTimeout(f._t);
+  f._t = setTimeout(function(){ f.classList.remove('on'); }, 4000);
+}
+
+// ── Open player ───────────────────────────────────────────────
+async function openPlayer(vidId){
+  var v = ST.videos.find(function(v){ return v.id === vidId; });
+  if(!v){ toast('Video not found','err'); return; }
+
+  var saved = ST.progress[v.id] || null;
+  var isRevision = !!(saved && saved.completed);
+
+  ST.curVid       = v;
+  ST.answeredQs   = saved ? JSON.parse(JSON.stringify(saved.answeredQs || {})) : {};
+  ST.scores       = saved ? JSON.parse(JSON.stringify(saved.scores     || {})) : {};
+  ST.activeQ      = null; ST.lastChk = -1; ST.seenNotes = {};
+  ST.timedOut     = false; ST._lastSave = -1; ST.isRevision = isRevision;
+  ST.seekMgr      = createSeekMgr(v.dur || 3600);
+  if(saved) ST.seekMgr.maxWatched = saved.maxWatched || 0;
+
+  // Header
+  if(document.getElementById('pt-title')) document.getElementById('pt-title').textContent = v.title;
+  if(document.getElementById('pt-sub'))   document.getElementById('pt-sub').textContent   = v.topic + ' · ' + (v.channel || '');
+  var qs = await loadQuestions(v.id);
+  if(document.getElementById('pt-qc')) document.getElementById('pt-qc').textContent = qs.length + ' Q';
+  var pts = Object.values(ST.scores).reduce(function(a,s){return a+s;},0);
+  if(document.getElementById('pt-sc')) document.getElementById('pt-sc').textContent = '🏆 ' + pts + ' pts';
+  if(document.getElementById('ch-credit')) document.getElementById('ch-credit').textContent = v.channel ? v.channel + ' — KAVEER' : '';
+
+  // Revision badge
+  var badge = document.getElementById('revision-badge');
+  if(badge) badge.style.display = isRevision ? 'block' : 'none';
+
+  // Reset overlays
+  var es = document.getElementById('end-screen');   if(es) es.style.display = 'none';
+  var ss = document.getElementById('splash-screen');if(ss) ss.classList.remove('on');
+  document.getElementById('q-overlay').classList.remove('on');
+  document.getElementById('s-player').classList.add('on');
+
+  // Teacher toolbar
+  var tb = document.getElementById('tc-toolbar');
+  if(ST.user && ST.user.role === 'teacher'){
+    if(tb){ tb.style.display='flex'; showTeacherToolbar(v.id); }
+    ST.seekMgr = null; // teacher: no seek restriction
+  }else{
+    if(tb) tb.style.display = 'none';
+  }
+
+  showControls();
+  renderQDots(qs);
+
+  // Show splash then start video
+  if(v.splashImg){
+    showSplash(v, function(){ startVideo(v, saved); });
+  }else{
+    startVideo(v, saved);
+  }
+}
+
+function startVideo(v, saved){
+  // Resume toast
+  if(saved && saved.resumeAt > 10 && !ST.isRevision){
+    showFlash('Resuming from ' + fmt(saved.resumeAt), true);
+  }
+  if(ST.isRevision){
+    showFlash('📺 Revision mode — questions auto-advance', true);
+  }
+  initYT(v.ytId, saved && !ST.isRevision ? (saved.resumeAt || 0) : 0);
+}
+
+function closePlayer(){
+  clearTimeout(_ctrlTimer);
+  clearInterval(_splashInterval);
+  stopTrack();
+  clearInterval(ST.qTimer);
+  if(document.getElementById('q-overlay'))
+    document.getElementById('q-overlay').classList.remove('on');
+  saveProgress();
+  if(ST.ytPlayer){
+    try{ ST.ytPlayer.pauseVideo(); }catch(e){}
+    var p = ST.ytPlayer;
+    setTimeout(function(){ try{ p.destroy(); }catch(e){} }, 200);
+    ST.ytPlayer = null;
+  }
+  var tb = document.getElementById('tc-toolbar'); if(tb) tb.style.display='none';
+  document.getElementById('s-player').classList.remove('on');
+  var yp = document.getElementById('yt-player'); if(yp) yp.innerHTML = '';
+  ST.curVid = null; ST.isRevision = false;
+  exitFS();
+}
+
+// ── Question system — fullscreen overlay ──────────────────────
+function showQuestion(q){
+  if(ST.isRevision){ showRevisionQ(q); return; }
+  ST.activeQ = q; ST.timedOut = false; ST.selOpt = null;
+  ST.qTL = 30; clearInterval(ST.qTimer);
+  if(ST.ytPlayer) ST.ytPlayer.pauseVideo();
+
+  var overlay = document.getElementById('q-overlay');
+  var inner   = document.getElementById('qp-inner');
+  if(!overlay || !inner) return;
+
+  var qs   = ST.questions[ST.curVid ? ST.curVid.id : ''] || [];
+  var qi   = qs.findIndex(function(x){ return x.id === q.id; }) + 1;
+  var opts = q.opts || ['A','B','C','D'];
+  var labs = ['A','B','C','D'];
+
+  inner.innerHTML = ''
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+      + '<div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--tl)">Q' + qi + ' <span style="color:var(--mu);font-weight:400">/ ' + qs.length + '</span></div>'
+      + '<div style="display:flex;align-items:center;gap:8px">'
+        + '<span class="badge bw" style="font-size:10px">' + (q.diff||'Medium') + '</span>'
+        + '<span style="font-size:11px;color:var(--mu)">+' + (q.pts||10) + ' pts</span>'
+        + '<div class="timer-wrap" style="position:relative;width:42px;height:42px;flex-shrink:0"><svg viewBox="0 0 48 48" width="42" height="42"><circle cx="24" cy="24" r="20" stroke="var(--sf2)" stroke-width="3" fill="none"/><circle id="q-tc" cx="24" cy="24" r="20" stroke="var(--tl)" stroke-width="3" fill="none" stroke-dasharray="125.6" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90,24,24)"/></svg><div class="timer-val" id="q-tv" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--tl)">30</div></div>'
+      + '</div>'
+    + '</div>'
+    + '<div style="font-size:clamp(15px,3vw,18px);font-weight:600;color:#fff;line-height:1.5;margin-bottom:16px">' + q.text + '</div>'
+    + '<div id="q-opts" style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px">'
+      + opts.map(function(o, i){
+          return '<div class="q-opt" id="qo' + i + '" onclick="selOpt(' + i + ')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid rgba(255,255,255,.15);border-radius:12px;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.04)">'
+            + '<span style="font-family:var(--fd);font-weight:800;font-size:16px;color:var(--tl);min-width:22px">' + labs[i] + '</span>'
+            + '<span style="font-size:15px;color:#fff;line-height:1.4">' + o + '</span>'
+          + '</div>';
+        }).join('')
+    + '</div>'
+    + '<div id="q-fb"></div>'
+    + '<div style="display:flex;gap:10px;justify-content:space-between;align-items:center">'
+      + '<button onclick="skipQ()" style="background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.6);padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-family:var(--fb)">Skip</button>'
+      + '<button id="q-sub" onclick="subQ()" disabled style="background:var(--tl);color:#0d0d14;border:none;padding:12px 28px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:var(--fb);opacity:.4;pointer-events:none">Submit →</button>'
+    + '</div>';
+
+  overlay.classList.add('on');
+  startQTimer();
+}
+
+// Revision mode: auto-advance questions
+function showRevisionQ(q){
+  var overlay = document.getElementById('q-overlay');
+  var inner   = document.getElementById('qp-inner');
+  if(!overlay || !inner) return;
+  if(ST.ytPlayer) ST.ytPlayer.pauseVideo();
+
+  var qs    = ST.questions[ST.curVid ? ST.curVid.id : ''] || [];
+  var qi    = qs.findIndex(function(x){ return x.id === q.id; }) + 1;
+  var opts  = q.opts || ['A','B','C','D'];
+  var labs  = ['A','B','C','D'];
+  var prev  = ST.answeredQs[q.id]; // true/false/undefined from previous attempt
+  var corr  = q.correct;
+
+  inner.innerHTML = ''
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+      + '<div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--ac2)">Q' + qi + ' · Revision</div>'
+      + '<div id="rev-countdown" style="font-size:12px;color:var(--mu)">Auto-advancing...</div>'
+    + '</div>'
+    + '<div style="font-size:clamp(14px,3vw,17px);font-weight:600;color:#fff;line-height:1.5;margin-bottom:14px">' + q.text + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'
+      + opts.map(function(o, i){
+          var isCorrect = i === corr;
+          var wasSelected = prev !== undefined && ((prev && i === corr) || (!prev && i === ST.lastSelections[q.id]));
+          return '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px solid '
+            + (isCorrect ? 'var(--tl)' : 'rgba(255,255,255,.1)') + ';border-radius:12px;background:'
+            + (isCorrect ? 'rgba(0,201,167,.12)' : 'rgba(255,255,255,.03)') + '">'
+            + '<span style="font-family:var(--fd);font-weight:800;font-size:15px;color:' + (isCorrect ? 'var(--tl)' : 'rgba(255,255,255,.4)') + ';min-width:22px">' + labs[i] + '</span>'
+            + '<span style="font-size:14px;color:' + (isCorrect ? '#fff' : 'rgba(255,255,255,.6)') + ';flex:1">' + o + '</span>'
+            + (isCorrect ? '<span style="color:var(--tl);font-size:16px">✓</span>' : '')
+          + '</div>';
+        }).join('')
+    + '</div>'
+    + (q.exp ? '<div style="padding:10px 12px;background:rgba(0,201,167,.08);border-left:3px solid var(--tl);border-radius:0 8px 8px 0;font-size:13px;color:rgba(255,255,255,.8);line-height:1.6;margin-bottom:12px">' + q.exp + '</div>' : '')
+    + '<div style="display:flex;gap:9px;justify-content:center">'
+      + '<button onclick="pauseRevision()" style="background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px">⏸ Pause</button>'
+      + '<button onclick="resumeAfterQ()" style="background:var(--ac2);color:#0d0d14;border:none;padding:10px 20px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer">Resume →</button>'
+    + '</div>';
+
+  overlay.classList.add('on');
+
+  // Auto-advance after 10 seconds
+  var secs = 10;
+  var rev = document.getElementById('rev-countdown');
+  ST.qTimer = setInterval(function(){
+    secs--;
+    if(rev) rev.textContent = 'Continuing in ' + secs + 's...';
+    if(secs <= 0){
+      clearInterval(ST.qTimer);
+      resumeAfterQ();
+    }
+  }, 1000);
+}
+
+var _revPaused = false;
+function pauseRevision(){
+  clearInterval(ST.qTimer);
+  var rev = document.getElementById('rev-countdown');
+  if(rev) rev.textContent = 'Paused — click Resume when ready';
+  _revPaused = true;
+}
+
+function selOpt(i){
+  if(ST.answeredQs[ST.activeQ && ST.activeQ.id] !== undefined) return;
+  ST.selOpt = i;
+  document.querySelectorAll('.q-opt').forEach(function(o, idx){
+    o.style.borderColor = idx === i ? 'var(--tl)' : 'rgba(255,255,255,.15)';
+    o.style.background  = idx === i ? 'rgba(0,201,167,.12)' : 'rgba(255,255,255,.04)';
+  });
+  var sub = document.getElementById('q-sub');
+  if(sub){ sub.disabled = false; sub.style.opacity='1'; sub.style.pointerEvents='auto'; }
+}
+
+function startQTimer(){
+  var total = ST.qTL;
+  ST.qTimer = setInterval(function(){
+    ST.qTL--;
+    var tv = document.getElementById('q-tv'); if(tv) tv.textContent = ST.qTL;
+    var tc = document.getElementById('q-tc'); if(tc) tc.style.strokeDashoffset = (125.6 - (125.6 * (ST.qTL/total)));
+    if(tv && ST.qTL <= 10) tv.style.color = 'var(--ac)';
+    if(ST.qTL <= 0){ clearInterval(ST.qTimer); timeoutQ(); }
+  }, 1000);
+}
+
+function timeoutQ(){
+  ST.timedOut = true;
+  var sub = document.getElementById('q-sub');
+  if(sub){ sub.textContent = 'Best Guess & Continue'; sub.disabled = false; sub.style.opacity='1'; sub.style.pointerEvents='auto'; }
+  var tv = document.getElementById('q-tv'); if(tv){ tv.textContent='⏰'; tv.style.color='var(--ac)'; }
+}
+
+// Track last selections for revision display
+if(!window.ST || !ST.lastSelections) { try{ ST.lastSelections = {}; }catch(e){} }
+
+function subQ(){
+  if(!ST.activeQ) return;
+  clearInterval(ST.qTimer);
+  var q = ST.activeQ;
+  var correct = !ST.timedOut && ST.selOpt !== null && ST.selOpt === q.correct;
+  ST.answeredQs[q.id] = correct;
+  if(ST.selOpt !== null) ST.lastSelections[q.id] = ST.selOpt;
+  if(correct) ST.scores[q.id] = q.pts || 10;
+
+  // Mark options
+  document.querySelectorAll('.q-opt').forEach(function(o, i){
+    if(i === q.correct){
+      o.style.borderColor = 'var(--tl)'; o.style.background = 'rgba(0,201,167,.15)';
+      o.innerHTML += '<span style="margin-left:auto;color:var(--tl);font-size:16px">✓</span>';
+    }else if(!correct && i === ST.selOpt){
+      o.style.borderColor = 'var(--ac)'; o.style.background = 'rgba(232,76,43,.1)';
+      o.innerHTML += '<span style="margin-left:auto;color:var(--ac);font-size:16px">✗</span>';
+    }
+    o.style.pointerEvents = 'none';
+  });
+
+  // Feedback
+  var fb = document.getElementById('q-fb');
+  if(fb) fb.innerHTML = '<div style="padding:10px 12px;background:' + (correct?'rgba(0,201,167,.1)':'rgba(232,76,43,.08)') + ';border-left:3px solid ' + (correct?'var(--tl)':'var(--ac)') + ';border-radius:0 8px 8px 0;margin-bottom:12px"><div style="font-size:13px;font-weight:700;color:' + (correct?'var(--tl)':'var(--ac)') + ';margin-bottom:4px">' + (correct ? '✓ Correct! +' + (q.pts||10) + ' pts' : (ST.timedOut ? '⏰ Time\'s up!' : '✗ Incorrect')) + '</div>' + (q.exp ? '<p style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.6">' + q.exp + '</p>' : '') + '</div>';
+
+  // XP popup
+  if(correct){
+    var popup = document.createElement('div');
+    popup.style.cssText = 'position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);background:var(--tl);color:#0d0d14;padding:12px 24px;border-radius:100px;font-family:var(--fd);font-size:18px;font-weight:800;z-index:9000;animation:up .4s cubic-bezier(.16,1,.3,1);pointer-events:none';
+    popup.textContent = '+' + (q.pts||10) + ' XP! 🎉';
+    document.body.appendChild(popup);
+    setTimeout(function(){ popup.remove(); }, 2000);
+  }
+
+  // Update pts
+  var pts = Object.values(ST.scores).reduce(function(a,s){return a+s;}, 0);
+  var ptEl = document.getElementById('pt-sc'); if(ptEl) ptEl.textContent = '🏆 ' + pts + ' pts';
+
+  // Update Q dots
+  renderQDots(ST.questions[q.videoId] || []);
+  saveProgress();
+
+  // Change submit to continue
+  var sub = document.getElementById('q-sub');
+  if(sub){ sub.textContent = 'Resume Video →'; sub.onclick = resumeAfterQ; sub.disabled = false; }
+}
+
+function skipQ(){
+  clearInterval(ST.qTimer);
+  if(ST.activeQ) ST.answeredQs[ST.activeQ.id] = false;
+  saveProgress();
+  resumeAfterQ();
+}
+
+function resumeAfterQ(){
+  clearInterval(ST.qTimer);
+  var overlay = document.getElementById('q-overlay');
+  if(overlay) overlay.classList.remove('on');
+  ST.activeQ = null;
+  if(ST.ytPlayer) ST.ytPlayer.playVideo();
+  showControls();
+}
+
+// ── End screen ────────────────────────────────────────────────
+function showEndScreen(){
+  var v = ST.curVid; if(!v) return;
+  var qs = ST.questions[v.id] || [];
+  var pts = Object.values(ST.scores).reduce(function(a,s){return a+s;}, 0);
+  var maxPts = qs.reduce(function(a,q){return a+(q.pts||10);}, 0);
+  var pct = maxPts > 0 ? Math.round((pts/maxPts)*100) : 0;
+
+  // Animate score ring
+  var arc = document.getElementById('end-score-arc');
+  if(arc) setTimeout(function(){ arc.style.strokeDashoffset = 276.5 - (276.5 * pct/100); }, 100);
+  var sc = document.getElementById('end-score'); if(sc) sc.textContent = pts;
+
+  // Links
+  var links = document.getElementById('end-links');
+  if(links){
+    var linksHTML = '';
+    if(v.notesLink) linksHTML += '<a href="'+v.notesLink+'" target="_blank" class="btn btn-g btn-sm">📝 Notes</a>';
+    if(v.quizLink)  linksHTML += '<a href="'+v.quizLink+'"  target="_blank" class="btn btn-g btn-sm">📝 Quiz 1</a>';
+    if(v.quiz2)     linksHTML += '<a href="'+v.quiz2+'"     target="_blank" class="btn btn-g btn-sm">📝 Quiz 2</a>';
+    links.innerHTML = linksHTML;
+  }
+
+  // Recommended
+  var recEl = document.getElementById('end-recommended');
+  if(recEl){
+    var myIdx = ST.videos.findIndex(function(vid){return vid.id===v.id;});
+    var recs = [];
+    if(myIdx >= 0 && myIdx < ST.videos.length-1) recs.push(ST.videos[myIdx+1]);
+    // Add top videos from different courses
+    ST.videos.filter(function(vid){return vid.id!==v.id&&(!recs.find(function(r){return r.id===vid.id;}));}).slice(0,2).forEach(function(r){recs.push(r);});
+    if(recs.length){
+      recEl.innerHTML = '<div style="font-family:var(--fd);font-size:13px;font-weight:700;margin-bottom:10px;color:var(--mu)">Up Next</div>'
+        + '<div style="display:flex;flex-direction:column;gap:8px">'
+        + recs.slice(0,3).map(function(r){
+            return '<div onclick="closePlayer();setTimeout(function(){openPlayer(\''+r.id+'\')},300)" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--tl)\'" onmouseout="this.style.borderColor=\'var(--bd)\'">'
+              + '<img src="https://img.youtube.com/vi/'+r.ytId+'/default.jpg" style="width:60px;height:45px;object-fit:cover;border-radius:6px;flex-shrink:0"/>'
+              + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+r.title+'</div><div style="font-size:11px;color:var(--mu)">'+r.topic+'</div></div>'
+            + '</div>';
+          }).join('')
+        + '</div>';
+    }
+  }
+
+  // Next button
+  var myIdx2 = ST.videos.findIndex(function(vid){return vid.id===v.id;});
+  var nb = document.getElementById('end-next-btn');
+  if(nb) nb.style.display = (myIdx2 >= 0 && myIdx2 < ST.videos.length-1) ? 'flex' : 'none';
+
+  var es = document.getElementById('end-screen');
+  if(es){ es.style.display='flex'; es.style.alignItems='center'; es.style.justifyContent='center'; }
+}
+
+function shareVideo(){
+  var v = ST.curVid; if(!v) return;
+  var url = window.location.href.split('?')[0] + '?v=' + v.id;
+  if(navigator.share){
+    navigator.share({ title: v.title, text: 'Watch "'+v.title+'" on KAVEER — free interactive learning!', url: url });
+  }else{
+    navigator.clipboard.writeText(url);
+    toast('Video link copied! 🔗');
+  }
+}
+
+// ── Track & update ────────────────────────────────────────────
+function startTrack(){
+  ST.trackInt = setInterval(function(){
+    if(!ST.ytPlayer || !ST.isPlaying) return;
+    try{
+      var t = ST.ytPlayer.getCurrentTime() || 0;
+      var d = ST.ytPlayer.getDuration()    || 0;
+      ST.curT = t; ST.dur = d;
+      if(ST.seekMgr) ST.seekMgr.update(t);
+      updateSeekUI();
+      checkQTriggers(t);
+      if(t - ST._lastSave > 15){ ST._lastSave = t; saveProgress(); }
+    }catch(e){}
+  }, 500);
+}
+function stopTrack(){ clearInterval(ST.trackInt); ST.trackInt = null; }
+
+function checkQTriggers(t){
+  var qs = ST.questions[ST.curVid ? ST.curVid.id : ''] || [];
+  for(var i = 0; i < qs.length; i++){
+    var q = qs[i];
+    if(Math.abs(t - q.ts) < 1.2 && ST.lastChk !== q.id){
+      ST.lastChk = q.id;
+      if(!ST.isRevision && ST.answeredQs[q.id] !== undefined) continue;
+      if(ST.ytPlayer) ST.ytPlayer.pauseVideo();
+      showQuestion(q);
+      return;
+    }
+  }
+}
+
+// ── YouTube IFrame API ────────────────────────────────────────
+function initYT(ytId, startTime){
+  var container = document.getElementById('yt-player');
+  if(!container) return;
+  container.innerHTML = '<div id="yt-iframe"></div>';
+  stopTrack();
+  if(ST.ytPlayer){ try{ ST.ytPlayer.destroy(); }catch(e){} ST.ytPlayer = null; }
+  if(window.YT && window.YT.Player){
+    createYT(ytId, startTime || 0);
+  }else{
+    window._pendingYT = {ytId, startTime: startTime || 0};
+    if(!document.querySelector('script[src*="youtube.com/iframe_api"]')){
+      var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+    }
+  }
+}
+
+window.onYouTubeIframeAPIReady = function(){
+  if(window._pendingYT){ createYT(window._pendingYT.ytId, window._pendingYT.startTime); window._pendingYT = null; }
+};
+
+function createYT(ytId, start){
+  try{
+    ST.ytPlayer = new YT.Player('yt-iframe',{
+      videoId: ytId,
+      playerVars:{ start: Math.floor(start)||0, autoplay:1, controls:0, modestbranding:1, rel:0, fs:0, iv_load_policy:3, disablekb:1 },
+      events:{
+        onReady: function(e){ e.target.playVideo(); ST.isPlaying = true; startTrack(); showControls(); },
+        onStateChange: function(e){
+          var s = e.data;
+          if(s === YT.PlayerState.PLAYING){
+            ST.isPlaying = true;
+            var pb = document.getElementById('play-btn'); if(pb) pb.textContent = '⏸';
+            startTrack(); showControls();
+          }else if(s === YT.PlayerState.PAUSED || s === YT.PlayerState.BUFFERING){
+            ST.isPlaying = false;
+            var pb2 = document.getElementById('play-btn'); if(pb2) pb2.textContent = '▶';
+            showControls();
+          }else if(s === YT.PlayerState.ENDED){
+            ST.isPlaying = false; stopTrack();
+            saveProgress().then(function(){ showEndScreen(); });
+          }
+        },
+        onError: function(e){
+          var box = document.getElementById('yt-box'); if(!box) return;
+          var d = document.createElement('div');
+          d.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg2);z-index:20;text-align:center;padding:20px';
+          d.innerHTML = '<div style="font-size:40px;margin-bottom:12px">⚠️</div><p style="color:var(--mu);margin-bottom:14px">Video unavailable or region-restricted.</p><a href="https://youtube.com/watch?v='+ytId+'" target="_blank" class="btn btn-t">Watch on YouTube</a>';
+          box.appendChild(d);
+        }
+      }
+    });
+  }catch(e){ console.error('YT error:', e); }
+}
+
+// ── Player controls ───────────────────────────────────────────
+function togglePlay(){
+  if(!ST.ytPlayer) return;
+  showControls();
+  if(ST.isPlaying) ST.ytPlayer.pauseVideo(); else ST.ytPlayer.playVideo();
+}
+function seekRel(delta){
+  if(!ST.ytPlayer) return;
+  showControls();
+  var t = (ST.ytPlayer.getCurrentTime() || 0) + delta;
+  // Only allow backward for students
+  if(delta > 0 && ST.user && ST.user.role === 'student' && ST.seekMgr){
+    var res = ST.seekMgr.canSeekTo(t, ST.curT);
+    if(!res.ok){ showFlash('Watch further to unlock ▶', false); return; }
+  }
+  ST.ytPlayer.seekTo(Math.max(0, t), true);
+}
+function toggleMute(){
+  if(!ST.ytPlayer) return;
+  ST.muted = !ST.muted;
+  if(ST.muted) ST.ytPlayer.mute(); else ST.ytPlayer.unMute();
+  var mb = document.getElementById('mute-btn'); if(mb) mb.textContent = ST.muted ? '🔇' : '🔊';
+  showControls();
+}
+function toggleFS(){
+  var el = document.getElementById('s-player');
+  if(!ST.isFullscreen){
+    if(el.requestFullscreen) el.requestFullscreen();
+    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    ST.isFullscreen = true;
+  }else{ exitFS(); }
+  showControls();
+}
+function exitFS(){
+  try{ if(document.exitFullscreen) document.exitFullscreen(); else if(document.webkitExitFullscreen) document.webkitExitFullscreen(); }catch(e){}
+  ST.isFullscreen = false;
+}
+document.addEventListener('fullscreenchange', function(){
+  if(!document.fullscreenElement && ST.isFullscreen){ ST.isFullscreen = false; }
+  var fb = document.getElementById('fs-btn');
+  if(fb) fb.textContent = document.fullscreenElement ? '✕FS' : '⛶';
+});
+
+function loadNextVideo(){
+  if(!ST.curVid) return;
+  var idx = ST.videos.findIndex(function(v){ return v.id === ST.curVid.id; });
+  if(idx >= 0 && idx < ST.videos.length - 1){
+    closePlayer();
+    setTimeout(function(){ openPlayer(ST.videos[idx+1].id); }, 300);
+  }else{
+    closePlayer(); toast('All videos completed! 🎉');
+  }
+}
+
+// ── Handle direct video links (?v=videoId in URL) ─────────────
+function checkVideoDeepLink(){
+  var params = new URLSearchParams(window.location.search);
+  var vidId  = params.get('v');
+  if(!vidId) return;
+  // Need to be logged in first
+  if(!ST.user){ 
+    ST._pendingVideo = vidId;
+    return; 
+  }
+  var v = ST.videos.find(function(v){ return v.id === vidId; });
+  if(v){ setTimeout(function(){ openPlayer(vidId); }, 500); }
+}
+
+// ── Teacher toolbar ───────────────────────────────────────────
+function showTeacherToolbar(vidId){
+  var tb = document.getElementById('tc-toolbar'); if(!tb) return;
+  var qs = (ST.questions[vidId] || []).length;
+  tb.style.display = 'flex';
+  tb.innerHTML = '<button onclick="createQAtTime(\''+vidId+'\')" style="display:flex;align-items:center;gap:6px;padding:9px 14px;background:var(--tl);color:var(--bg);border:none;border-radius:var(--r);cursor:pointer;font-weight:700;font-size:13px;white-space:nowrap;box-shadow:0 4px 16px rgba(0,201,167,.4)">❓ Add Q at this Time</button>'
+    + '<button onclick="openQEditor(\''+vidId+'\')" style="display:flex;align-items:center;gap:6px;padding:9px 14px;background:rgba(13,13,20,.9);color:#fff;border:1px solid var(--bd2);border-radius:var(--r);cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap;backdrop-filter:blur(8px)">✏️ All Q ('+qs+')</button>';
+}
+
+function createQAtTime(vidId){
+  var t = 0;
+  if(ST.ytPlayer && ST.ytPlayer.getCurrentTime) t = Math.floor(ST.ytPlayer.getCurrentTime() || 0);
+  if(ST.ytPlayer) ST.ytPlayer.pauseVideo();
+  openQForm(vidId, null, null, t);
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if(!ST.curVid || !document.getElementById('s-player').classList.contains('on')) return;
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if(e.code === 'Space'){ e.preventDefault(); togglePlay(); }
+  else if(e.code === 'ArrowLeft')  seekRel(-10);
+  else if(e.code === 'ArrowRight') seekRel(10);
+  else if(e.code === 'KeyM')       toggleMute();
+  else if(e.code === 'KeyF')       toggleFS();
+  else if(e.code === 'Escape'){
+    var ov = document.getElementById('q-overlay');
+    if(ov && ov.classList.contains('on')) return;
+    if(ST.isFullscreen) exitFS(); else closePlayer();
+  }
+});
+
+// ── Notification emails on new video ─────────────────────────
+async function exportMarks(filterFn){
+  toast('Preparing export...','inf');
+  var students = ST.users.filter(function(u){ return u.role==='student' && (!filterFn || filterFn(u)); });
+  var headers = ['Name','Email','Roll No','College','Videos Watched','Total XP','Profile %'];
+  // Add per-video columns
+  var vidHeaders = ST.videos.map(function(v){ return v.title.slice(0,30); });
+  headers = headers.concat(vidHeaders);
+  var rows = [headers];
+
+  for(var i=0;i<students.length;i++){
+    var s = students[i];
+    var watchedCount = 0, totalXP = 0;
+    var vidScores = ST.videos.map(function(v){
+      var p = null;
+      // Get from local cache if available
+      var key = s.id + '_' + v.id;
+      if(ST.progress && ST.progress[v.id]) p = ST.progress[v.id];
+      if(p && p.userId === s.id){ watchedCount++; totalXP += (p.totalScore||0); return (p.maxWatched&&v.dur?Math.min(100,Math.round(p.maxWatched/v.dur*100)):0)+'%'; }
+      return '—';
+    });
+    var profPct = Math.round([s.wa,s.college,s.branch,s.objective].filter(Boolean).length/4*100);
+    rows.push([s.name,s.email,s.roll_no||'',s.college||'',watchedCount,totalXP,profPct+'%'].concat(vidScores));
+  }
+
+  var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href=url; a.download='KAVEER_marks_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  toast('Marks exported!');
+}
+
+// ── Init: check for video deep link on page load ──────────────
+window.addEventListener('DOMContentLoaded', function(){
+  setTimeout(checkVideoDeepLink, 1000);
+});
+
+
+// ── EXTRAS ──
+
+// ── Saved topics list for add-video form ─────────────────────
+var SAVED_TOPICS = [];
+
+// ── Updated tcReports with export marks button ────────────────
+function tcReports(){
+  var students = ST.users.filter(function(u){return u.role==='student';});
+  return '<h2 style="font-family:var(--fd);margin-bottom:14px">Student Reports</h2>'
+    +'<div style="display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap">'
+      +'<button class="btn btn-t btn-sm" onclick="exportMarks(null)">📊 Export All Marks</button>'
+    +'</div>'
+    +'<div class="info-box" style="margin-bottom:14px">Data updates in real-time. Export to see marks per video.</div>'
+    +'<div class="tw"><table><thead><tr><th>Student</th><th>Roll No</th><th>College</th><th>Watched</th><th>Profile %</th></tr></thead><tbody>'
+    +students.map(function(s){
+      var watched=Object.keys(ST.progress||{}).filter(function(k){return k.startsWith(s.id+'_');}).length;
+      return '<tr><td><strong>'+s.name+'</strong></td><td style="font-size:12px">'+(s.roll_no||'—')+'</td><td style="font-size:12px;color:var(--mu)">'+(s.college||'—')+'</td><td>'+watched+'</td><td>'+Math.round([s.wa,s.college,s.branch,s.objective].filter(Boolean).length/4*100)+'%</td></tr>';
+    }).join('')
+    +'</tbody></table></div>';
+}
+
+// ── Video topic history ───────────────────────────────────────
+function getAllTopics(){
+  var fromVids = ST.videos.map(function(v){return v.topic;}).filter(Boolean);
+  return [...new Set(SAVED_TOPICS.concat(fromVids))].sort();
+}
+
+async function notifyInterestedStudents(video){
+  if(!BREVO_KEY||!BREVO_FROM) return;
+  var tags=video.tags||[video.topic];
+  var interested=ST.users.filter(function(u){
+    return u.role==='student'&&u.interests&&u.interests.some(function(int){
+      return tags.some(function(tag){return tag.toLowerCase().includes(int.toLowerCase())||int.toLowerCase().includes(tag.toLowerCase());});
+    });
+  });
+  for(var i=0;i<Math.min(interested.length,50);i++){
+    var u=interested[i];
+    if(!u.email||DEMO_EMAILS.indexOf(u.email)>=0) continue;
+    try{
+      await sendEmailOTP(u.email,'',null); // minimal - just trigger
+      await fetch('https://api.brevo.com/v3/smtp/email',{
+        method:'POST',headers:{'Content-Type':'application/json','api-key':BREVO_KEY},
+        body:JSON.stringify({sender:{name:BREVO_NAME||'KAVEER',email:BREVO_FROM},to:[{email:u.email,name:u.name}],
+          subject:'New Video: "'+video.title+'" on KAVEER 📺',
+          htmlContent:'<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;background:#0d0d14;color:#f0eefc;border-radius:12px"><div style="font-size:20px;font-weight:800;margin-bottom:16px;color:#00c9a7">KAVEER</div><p style="color:#888">Hi '+u.name.split(' ')[0]+', a new video on '+video.topic+' has been added!</p><div style="background:#1f1f30;padding:14px;border-radius:8px;margin:14px 0;border-left:3px solid #00c9a7"><div style="font-weight:700">'+video.title+'</div><div style="font-size:12px;color:#666">'+video.topic+'</div></div><a href="'+window.location.href.split('?')[0]+'?v='+video.id+'" style="display:inline-block;padding:12px 24px;background:#00c9a7;color:#0d0d14;font-weight:700;border-radius:8px;text-decoration:none">Watch Now</a></div>'
+        })
+      });
+    }catch(e){}
+  }
+}
+
+
+
 
 </script>
 </body>
