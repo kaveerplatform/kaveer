@@ -555,6 +555,11 @@ textarea.fi{resize:vertical;min-height:80px}
 
 
 
+
+
+
+
+
 // ═══════════════════════════════════════════════════════════════
 // KAVEER v8 — Complete JavaScript
 // Real-time Firestore database — works across ALL devices
@@ -776,7 +781,7 @@ function listenVideos(){
 }
 
 function listenUsers(){
-  // Only for admin/teacher
+  if(!db){ console.warn('[KAVEER] listenUsers: db not ready'); return; }
   var unsub=db.collection('users').onSnapshot(function(snap){
     ST.users=snap.docs.map(function(d){return{id:d.id,...d.data()};});
     var tm=$('tc-main'), am=$('adm-main');
@@ -833,6 +838,17 @@ var FIELD_CONFIG={
 };
 
 async function loadSettings(){
+  // First: load from localStorage cache (instant, no network)
+  try{
+    var cached=JSON.parse(localStorage.getItem('kv_st_settings')||'{}');
+    if(cached.yt)        ST.settings.yt=cached.yt;
+    if(cached.li)        ST.settings.li=cached.li;
+    if(cached.shareMsg)  ST.settings.shareMsg=cached.shareMsg;
+    if(cached.globalSplash) ST.settings.globalSplash=cached.globalSplash;
+  }catch(e){}
+  var brev=localStorage.getItem('kv_brevo_bootstrap');
+  if(brev){ try{var b=JSON.parse(brev);if(b.key)BREVO_KEY=b.key;if(b.from)BREVO_FROM=b.from;if(b.name)BREVO_NAME=b.name;}catch(e){} }
+  
   if(!db) return;
   try{
     var s=await fsGet('settings','global');
@@ -1075,6 +1091,11 @@ async function verOtp(){
 
 function finishLogin(user){
   ST.user=user;
+  // Try to init Firebase from localStorage if not already done
+  if(!db){
+    var stored=localStorage.getItem('kv_fb_bootstrap');
+    if(stored){ try{ var c=JSON.parse(stored); if(c&&c.apiKey) initFirebase(c); }catch(e){} }
+  }
   // Immediately clear and hide login screen to avoid confusion
   var loginScreen=$('s-login');
   if(loginScreen){
@@ -1106,6 +1127,12 @@ async function admLogin(){
   hideErr('lerr');
   if(!rl('admin_'+u,3)){ showErr('lerr','Too many admin attempts.'); return; }
 
+  // Try to init Firebase from localStorage if not already done
+  if(!db){
+    var stored=localStorage.getItem('kv_fb_bootstrap');
+    if(stored){ try{ var c=JSON.parse(stored); if(c&&c.apiKey) initFirebase(c); }catch(e){} }
+  }
+
   // Credentials: from Firestore (loaded by listenSettings) or hardcoded fallback
   var adminUser = window._admUser || 'admin';
   var adminPass = window._admPass || 'Kav3er@Admin#2025';
@@ -1114,8 +1141,14 @@ async function admLogin(){
     ST.user={id:'ADMIN',name:'Admin',role:'admin',email:'admin@kaveer.app'};
     if($('adm-u'))$('adm-u').value=''; if($('adm-p'))$('adm-p').value='';
     window._isAdmin=true;
-    // Start listeners only if Firebase is configured
-    if(db){ listenSettings(); listenUsers(); listenVideos(); }
+    if(db){
+      // Start real-time listeners
+      listenSettings();
+      listenUsers();
+      listenVideos();
+      // Load settings immediately so admSet shows current values
+      try{ await loadSettings(); }catch(e){}
+    }
     startAdmTimer(); renderAdmin(); goTo('s-admin');
     setTimeout(initMobileNav,100);
   }else showErr('lerr','Invalid admin credentials.');
@@ -2144,19 +2177,17 @@ async function fetchMeta(){
 async function saveVideo(){
   // Check Firebase is configured before attempting to save
   if(!db){
-    toast('Firebase not configured. Admin must set up Firebase first (Admin → Settings).','err');
-    var mo=document.getElementById('add-vid-mo');
-    if(mo){
-      var warn=mo.querySelector('.fb-warn');
-      if(!warn){
-        warn=document.createElement('div');
-        warn.className='info-box fb-warn';
-        warn.style.cssText='border-color:var(--ac);color:var(--ac);margin-bottom:10px';
-        warn.innerHTML='⚠ Firebase not configured. Ask admin to set up Firebase in Admin → Settings first.';
-        mo.querySelector('.mo').insertBefore(warn, mo.querySelector('.mo').firstChild);
-      }
+    // Try to initialize from localStorage bootstrap one more time
+    try{
+      var stored=localStorage.getItem('kv_fb_bootstrap');
+      if(stored){ var cfg=JSON.parse(stored); if(cfg&&cfg.apiKey&&initFirebase(cfg)){ listenVideos(); listenUsers(); } }
+    }catch(e){}
+    // Still no db?
+    if(!db){
+      toast('Firebase not set up. Go to Admin → Settings → enter Firebase config → Save.','err');
+      if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='Add Video →'; }
+      return;
     }
-    return;
   }
   // Show loading on save button
   var saveBtn=document.getElementById('save-vid-btn');
@@ -2305,18 +2336,23 @@ function renderAdmin(){
 }
 
 function showAdmSec(sec,btn){
-  // Security: never render admin content without verified admin session
   if(!ST.user||ST.user.role!=='admin'){ goTo('s-landing'); return; }
   document.querySelectorAll('#s-admin .si').forEach(function(s){s.classList.remove('on');});
   if(btn)btn.classList.add('on');
-  var m=$('adm-main');if(!m)return;
+  var m=$('adm-main'); if(!m)return;
   m.dataset.sec=sec;
-  if(sec==='overview') m.innerHTML=admOv();
+  if(sec==='overview')      m.innerHTML=admOv();
   else if(sec==='students') m.innerHTML=admStu();
-  else if(sec==='videos') m.innerHTML=admVids();
-  else if(sec==='testimonials') admTests().then(function(html){m.innerHTML=html;});
-  else if(sec==='requests') admRequests().then(function(html){m.innerHTML=html;});
-  else if(sec==='settings'){try{m.innerHTML=admSet();}catch(e){m.innerHTML='<div class="box"><p style="color:var(--ac)">Settings error: '+e.message+'</p><p style="font-size:12px;color:var(--mu)">Try Ctrl+Shift+R to reload.</p></div>';console.error(e);}}
+  else if(sec==='videos')   m.innerHTML=admVids();
+  else if(sec==='testimonials') admTests().then(function(h){m.innerHTML=h;});
+  else if(sec==='requests') admRequests().then(function(h){m.innerHTML=h;});
+  else if(sec==='settings'){
+    m.innerHTML='<div class="loading-full"><div class="spin"></div><p style="color:var(--mu);margin-top:12px">Loading settings...</p></div>';
+    (db?loadSettings():Promise.resolve()).then(function(){
+      try{ m.innerHTML=admSet(); }
+      catch(e){ m.innerHTML='<div class="box"><p style="color:var(--ac)">Error: '+e.message+'</p></div>'; console.error(e); }
+    });
+  }
 }
 
 function admOv(){
@@ -2464,42 +2500,46 @@ async function saveFirebaseCfg(){
   var appId=sanR(($('fb-appid')||{value:''}).value).trim();
   if(!apiKey||!authDomain||!projectId){toast('API Key, Auth Domain and Project ID required','err');return;}
   var cfg={apiKey,authDomain,projectId,appId};
-  // Save to localStorage (works on this device immediately)
+  // Save to localStorage immediately (works on this device)
   localStorage.setItem('kv_fb_bootstrap', JSON.stringify(cfg));
+  localStorage.setItem('kv_fb_pid', projectId);
   FB_CONFIG=cfg;
-  // Initialize Firebase with new config
-  var ok = initFirebase(cfg);
+  var ok=initFirebase(cfg);
   if(ok){
-    // Save to Firestore now that Firebase is running
     try{ await saveSettings({fbConfig:cfg}); }catch(e){}
-    toast('✅ Firebase saved! Now click "⬇ Download Configured Site" below and upload to GitHub — this makes it work on ALL devices permanently.');
+    toast('Firebase configured! Other devices connect automatically via cloud.');
   }else{
-    toast('Saved! Reload the page to activate Firebase.','inf');
+    toast('Saved to browser. Reload to activate Firebase.','inf');
   }
 }
 
 async function saveBrevoSettings(){
+  if(!db){toast('Firebase not configured yet. Set up Firebase first.','err');return;}
   BREVO_KEY=sanR(($('brevo-k')||{value:''}).value).trim();
   BREVO_FROM=sanR(($('brevo-f')||{value:''}).value).trim();
   BREVO_NAME=sanR(($('brevo-n')||{value:''}).value).trim()||'KAVEER';
-  // Save to localStorage so it works across devices
   localStorage.setItem('kv_brevo_bootstrap',JSON.stringify({key:BREVO_KEY,from:BREVO_FROM,name:BREVO_NAME}));
-  if(db){ try{ await saveSettings({brevoKey:BREVO_KEY,brevoFrom:BREVO_FROM,brevoName:BREVO_NAME}); }catch(e){} }
-  toast('Email settings saved! ✅ All devices will use this automatically.');
+  try{ await saveSettings({brevoKey:BREVO_KEY,brevoFrom:BREVO_FROM,brevoName:BREVO_NAME}); }catch(e){}
+  toast('Email settings saved! All devices get this automatically.');
 }
 
 async function saveSocialLinks(){
+  if(!db){toast('Firebase not configured yet. Set up Firebase first.','err');return;}
   var yt=sanR(($('yt-url-i')||{value:''}).value).trim();
   var li=sanR(($('li-url-i')||{value:''}).value).trim();
-  ST.settings.yt=yt;ST.settings.li=li;
+  ST.settings.yt=yt; ST.settings.li=li;
+  // Cache in localStorage too
+  try{var c=JSON.parse(localStorage.getItem('kv_st_settings')||'{}');c.yt=yt;c.li=li;localStorage.setItem('kv_st_settings',JSON.stringify(c));}catch(e){}
   await saveSettings({ytUrl:yt,liUrl:li});
-  toast('Social links saved!');
+  toast('Social links saved! Visible on all devices.');
 }
 
 async function saveShareMsg(){
+  if(!db){toast('Firebase not configured yet.','err');return;}
   var msg=sanR(($('share-msg-i')||{value:''}).value).trim();
   if(!msg){toast('Cannot be empty','err');return;}
   ST.settings.shareMsg=msg;
+  try{var c=JSON.parse(localStorage.getItem('kv_st_settings')||'{}');c.shareMsg=msg;localStorage.setItem('kv_st_settings',JSON.stringify(c));}catch(e){}
   await saveSettings({shareMsg:msg});
   toast('Share message saved!');
 }
@@ -2565,37 +2605,62 @@ window.addEventListener('DOMContentLoaded',function(){
   ST.user = null;
   ST.fbUser = null;
   window._isAdmin = false;
-  // ── BOOTSTRAP: Initialize Firebase from hardcoded config or localStorage ──
-  // Priority: 1) Hardcoded in file  2) localStorage  3) Prompt admin
+  // ── BOOTSTRAP: Initialize Firebase on every device automatically ──────────
+  // Priority: 1) Hardcoded HC vars  2) localStorage  3) Firestore REST API
   (function(){
     try{
-      // Try hardcoded config first (baked into file by admin)
-      var cfg = null;
-      if(_HC_API_KEY && _HC_AUTH_DOMAIN && _HC_PROJECT_ID){
-        cfg = {apiKey:_HC_API_KEY, authDomain:_HC_AUTH_DOMAIN, projectId:_HC_PROJECT_ID, appId:_HC_APP_ID};
-        console.log('[KAVEER] Using hardcoded Firebase config');
+      var cfg=null;
+      // Priority 1: HC vars baked into file
+      if(typeof _HC_API_KEY!=='undefined'&&_HC_API_KEY&&_HC_AUTH_DOMAIN&&_HC_PROJECT_ID){
+        cfg={apiKey:_HC_API_KEY,authDomain:_HC_AUTH_DOMAIN,projectId:_HC_PROJECT_ID,appId:_HC_APP_ID||''};
       }
-      // Fallback: try localStorage bootstrap (from previous save on THIS device)
+      // Priority 2: localStorage bootstrap
       if(!cfg){
-        var stored = localStorage.getItem('kv_fb_bootstrap');
-        if(stored){ cfg = JSON.parse(stored); console.log('[KAVEER] Using localStorage bootstrap'); }
+        var stored=localStorage.getItem('kv_fb_bootstrap');
+        if(stored){ try{ var c=JSON.parse(stored); if(c&&c.apiKey&&c.authDomain&&c.projectId) cfg=c; }catch(e){} }
       }
-      // Apply Brevo from hardcoded
-      if(_HC_BREVO_KEY){ BREVO_KEY=_HC_BREVO_KEY; BREVO_FROM=_HC_BREVO_FROM; BREVO_NAME=_HC_BREVO_NAME||'KAVEER'; }
-      // Fallback: Brevo from localStorage
-      if(!BREVO_KEY){
-        var brev = localStorage.getItem('kv_brevo_bootstrap');
-        if(brev){ var b=JSON.parse(brev); BREVO_KEY=b.key||''; BREVO_FROM=b.from||''; BREVO_NAME=b.name||'KAVEER'; }
-      }
-      if(cfg && cfg.apiKey && cfg.authDomain && cfg.projectId){
-        if(initFirebase(cfg)){
-          console.log('[KAVEER] Firebase ready');
-          setTimeout(function(){
-            // Do NOT auto-restore auth session - user must explicitly login
-            // checkRedirectResult only needed after Google Sign-In popup/redirect
-            // Load settings (non-auth data only)
-            loadSettings();
-          }, 400);
+      // Apply Brevo from HC vars
+      if(typeof _HC_BREVO_KEY!=='undefined'&&_HC_BREVO_KEY){ BREVO_KEY=_HC_BREVO_KEY; BREVO_FROM=_HC_BREVO_FROM||''; BREVO_NAME=_HC_BREVO_NAME||'KAVEER'; }
+      // Apply Brevo from localStorage
+      if(!BREVO_KEY){ var brev=localStorage.getItem('kv_brevo_bootstrap'); if(brev){ try{ var b=JSON.parse(brev); BREVO_KEY=b.key||''; BREVO_FROM=b.from||''; BREVO_NAME=b.name||'KAVEER'; }catch(e){} } }
+      if(cfg&&cfg.apiKey&&cfg.authDomain&&cfg.projectId){
+        if(initFirebase(cfg)){ setTimeout(loadSettings,400); }
+      } else {
+        // Priority 3: Firestore REST API using saved projectId
+        var pid=localStorage.getItem('kv_fb_pid');
+        if(pid){
+          fetch('https://firestore.googleapis.com/v1/projects/'+pid+'/databases/(default)/documents/settings/global')
+            .then(function(r){return r.json();})
+            .then(function(doc){
+              if(!doc||!doc.fields) return;
+              var flds=doc.fields;
+              // Extract fbConfig
+              var fbMap=flds.fbConfig&&flds.fbConfig.mapValue&&flds.fbConfig.mapValue.fields;
+              if(fbMap){
+                var rc={
+                  apiKey:(fbMap.apiKey&&fbMap.apiKey.stringValue)||'',
+                  authDomain:(fbMap.authDomain&&fbMap.authDomain.stringValue)||'',
+                  projectId:(fbMap.projectId&&fbMap.projectId.stringValue)||pid,
+                  appId:(fbMap.appId&&fbMap.appId.stringValue)||''
+                };
+                if(rc.apiKey&&rc.authDomain){
+                  localStorage.setItem('kv_fb_bootstrap',JSON.stringify(rc));
+                  if(initFirebase(rc)){
+                    // Apply other settings from REST response
+                    if(flds.brevoKey&&flds.brevoKey.stringValue) BREVO_KEY=flds.brevoKey.stringValue;
+                    if(flds.brevoFrom&&flds.brevoFrom.stringValue) BREVO_FROM=flds.brevoFrom.stringValue;
+                    if(flds.ytUrl&&flds.ytUrl.stringValue) ST.settings.yt=flds.ytUrl.stringValue;
+                    if(flds.liUrl&&flds.liUrl.stringValue) ST.settings.li=flds.liUrl.stringValue;
+                    if(flds.shareMsg&&flds.shareMsg.stringValue) ST.settings.shareMsg=flds.shareMsg.stringValue;
+                    if(flds.globalSplash&&flds.globalSplash.stringValue) ST.settings.globalSplash=flds.globalSplash.stringValue;
+                    setTimeout(loadSettings,400);
+                    // Remove Firebase warning from UI
+                    var lerr=document.getElementById('lerr');
+                    if(lerr&&lerr.style.display!=='none') lerr.style.display='none';
+                  }
+                }
+              }
+            }).catch(function(){});
         }
       }
     }catch(e){ console.warn('[KAVEER] Bootstrap error:',e); }
@@ -3434,12 +3499,19 @@ function _applyConfigAndDownload(pageHTML, apiKey, authDomain, projectId, appId,
 }
 
 async function saveGlobalSplash(){
+  if(!db){toast('Firebase not configured yet.','err');return;}
   var url = sanR((document.getElementById('global-splash-url')||{value:''}).value).trim();
   ST.settings.globalSplash = url;
+  try{var c=JSON.parse(localStorage.getItem('kv_st_settings')||'{}');c.globalSplash=url;localStorage.setItem('kv_st_settings',JSON.stringify(c));}catch(e){}
   await saveSettings({globalSplash: url});
-  toast(url ? '✅ Splash screen saved! All students see it before every video.' : 'Splash screen removed.');
-  showAdmSec('settings', null); // refresh to show preview
+  toast(url ? 'Splash screen saved! All students see it before every video.' : 'Splash screen removed.');
+  showAdmSec('settings', null);
 }
+
+
+
+
+
 
 
 </script>
