@@ -554,6 +554,7 @@ textarea.fi{resize:vertical;min-height:80px}
 
 
 
+
 // ═══════════════════════════════════════════════════════════════
 // KAVEER v8 — Complete JavaScript
 // Real-time Firestore database — works across ALL devices
@@ -563,13 +564,13 @@ textarea.fi{resize:vertical;min-height:80px}
 // ── HARDCODED CONFIG (replaced by "Download Configured Site") ──
 // These placeholders are filled when admin clicks "Download Configured Site"
 // Upload that file to GitHub → works on ALL devices automatically
-var _HC_API_KEY      = 'AIzaSyCQ3s1E1Kb9DbZrQTcMkKBSvzyLxieM7cQ'; // configured
-var _HC_AUTH_DOMAIN  = 'kaveer-6f771.firebaseapp.com'; // configured
-var _HC_PROJECT_ID   = 'kaveer-6f771'; // configured
-var _HC_APP_ID       = '1:421590906831:web:f2cac514884b6d1b64c4ba'; // configured
-var _HC_BREVO_KEY    = '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'; // configured
-var _HC_BREVO_FROM   = 'kaveer.platform@gmail.com'; // configured
-var _HC_BREVO_NAME   = 'KAVEER'; // configured
+var _HC_API_KEY      = ''; // KAVEER_PLACEHOLDER_APIKEY
+var _HC_AUTH_DOMAIN  = ''; // KAVEER_PLACEHOLDER_AUTHDOMAIN
+var _HC_PROJECT_ID   = ''; // KAVEER_PLACEHOLDER_PROJECTID
+var _HC_APP_ID       = ''; // KAVEER_PLACEHOLDER_APPID
+var _HC_BREVO_KEY    = ''; // KAVEER_PLACEHOLDER_BREVOKEY
+var _HC_BREVO_FROM   = ''; // KAVEER_PLACEHOLDER_BREVOFROM
+var _HC_BREVO_NAME   = ''; // KAVEER_PLACEHOLDER_BREVONAME
 
 // FB_CONFIG uses hardcoded values if available, else empty
 var FB_CONFIG = {
@@ -938,15 +939,44 @@ async function sendWelcomeEmail(user){
 
 // ── Google Sign-In via Firebase ───────────────────────────────
 function signInWithGoogle(){
-  if(!fbAuth){ showErr('lerr','Firebase not configured. Admin must set up Firebase first.'); return; }
+  if(!fbAuth){
+    showErr('lerr','Firebase not configured. Contact your admin to set up Firebase first.');
+    return;
+  }
   hideErr('lerr');
+
+  // Show loading state on ALL Google buttons (login + register)
+  document.querySelectorAll('button').forEach(function(btn){
+    if(btn.textContent.indexOf('Google')>=0||btn.textContent.indexOf('Sign up with Google')>=0){
+      btn._origHTML = btn.innerHTML;
+      btn.innerHTML = '<div class="spin" style="width:16px;height:16px;border-width:2px;margin-right:8px"></div> Connecting to Google...';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+    }
+  });
+
   var provider=new firebase.auth.GoogleAuthProvider();
   provider.addScope('email'); provider.addScope('profile');
+
+  function restoreButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      if(btn._origHTML){ btn.innerHTML=btn._origHTML; btn.disabled=false; btn.style.opacity='1'; delete btn._origHTML; }
+    });
+  }
+
   fbAuth.signInWithPopup(provider)
-    .then(function(result){ handleFbAuthUser(result.user); })
+    .then(function(result){
+      // Keep loading — page will transition
+      handleFbAuthUser(result.user);
+    })
     .catch(function(error){
-      if(error.code==='auth/popup-closed-by-user') return;
-      if(error.code==='auth/popup-blocked'){ fbAuth.signInWithRedirect(provider); return; }
+      restoreButtons();
+      if(error.code==='auth/popup-closed-by-user'||error.code==='auth/cancelled-popup-request') return;
+      if(error.code==='auth/popup-blocked'){
+        toast('Popup blocked. Redirecting...','inf');
+        fbAuth.signInWithRedirect(provider);
+        return;
+      }
       showErr('lerr','Google sign-in failed: '+(error.message||error.code));
     });
 }
@@ -1045,9 +1075,15 @@ async function verOtp(){
 
 function finishLogin(user){
   ST.user=user;
-  $('l-s1').style.display='block'; $('l-s2').style.display='none';
-  var em=$('l-email'); if(em) em.value='';
-  hideErr('lerr');
+  // Immediately clear and hide login screen to avoid confusion
+  var loginScreen=$('s-login');
+  if(loginScreen){
+    loginScreen.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-direction:column;gap:16px"><div class="spin" style="width:40px;height:40px;border-width:3px"></div><div style="font-family:var(--fd);font-size:16px;color:var(--mu)">Signing you in...</div></div>';
+  }
+  var regScreen=$('s-reg');
+  if(regScreen&&regScreen.classList.contains('on')){
+    regScreen.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-direction:column;gap:16px"><div class="spin" style="width:40px;height:40px;border-width:3px"></div><div style="font-family:var(--fd);font-size:16px;color:var(--mu)">Creating your account...</div></div>';
+  }
   // Start real-time listeners only if Firebase configured
   if(db){
     listenSettings();
@@ -2098,7 +2134,7 @@ function openAddVid(editId){
 async function fetchMeta(){
   var url=sanR(($('av-url')||{value:''}).value);
   var ytId=extractYtId(url);
-  if(!ytId){toast('Invalid YouTube URL','err');return;}
+  if(!ytId){toast('Invalid YouTube URL','err');restoreSaveBtn();return;}
   try{
     var res=await fetch('https://www.youtube.com/oembed?url=https://youtube.com/watch?v='+ytId+'&format=json');
     if(res.ok){var data=await res.json(); if($('av-title')&&!$('av-title').value)$('av-title').value=data.title||''; if($('av-channel')&&!$('av-channel').value)$('av-channel').value=data.author_name||''; toast('Video info fetched!');}
@@ -2106,8 +2142,32 @@ async function fetchMeta(){
 }
 
 async function saveVideo(){
+  // Check Firebase is configured before attempting to save
+  if(!db){
+    toast('Firebase not configured. Admin must set up Firebase first (Admin → Settings).','err');
+    var mo=document.getElementById('add-vid-mo');
+    if(mo){
+      var warn=mo.querySelector('.fb-warn');
+      if(!warn){
+        warn=document.createElement('div');
+        warn.className='info-box fb-warn';
+        warn.style.cssText='border-color:var(--ac);color:var(--ac);margin-bottom:10px';
+        warn.innerHTML='⚠ Firebase not configured. Ask admin to set up Firebase in Admin → Settings first.';
+        mo.querySelector('.mo').insertBefore(warn, mo.querySelector('.mo').firstChild);
+      }
+    }
+    return;
+  }
+  // Show loading on save button
+  var saveBtn=document.getElementById('save-vid-btn');
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='Saving...'; }
+  function restoreSaveBtn(){ if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent=saveBtn.dataset.editMode?'Update Video →':'Add Video →'; } }
+
   var title=sanR(($('av-title')||{value:''}).value).trim();
-  var topic=sanR(($('av-topic')||{value:''}).value).trim();
+  // Topic: read from new-topic input first, then the hidden field, then the plain input
+  var topicNew=sanR(($('av-topic-new')||{value:''}).value).trim();
+  var topicHid=sanR(($('av-topic')||{value:''}).value).trim();
+  var topic=topicNew||topicHid;
   var channel=sanR(($('av-channel')||{value:''}).value).trim();
   var courseNew=sanR(($('av-course-new')||{value:''}).value).trim();
   var courseSel=sanR(($('av-course')||{value:''}).value).trim();
@@ -2116,7 +2176,7 @@ async function saveVideo(){
   var notes=sanR(($('av-notes')||{value:''}).value).trim();
   var mo=document.getElementById('add-vid-mo');
   var editId=mo?mo.dataset.editId:'';
-  if(!title||!topic){toast('Title and topic are required','err');return;}
+  if(!title||!topic){toast('Title and topic are required','err');restoreSaveBtn();return;}
   if(editId){
     await fsUpdate('videos',editId,{title,topic,channel,course,subj,notesLink:notes,quizLink:sanR(($("av-quiz")||{value:""}).value).trim(),quiz2:sanR(($("av-quiz2")||{value:""}).value).trim(),splashImg:sanR(($("av-splash")||{value:""}).value).trim(),tags:[topic,subj].filter(Boolean)});
     toast('"'+title+'" updated!');
@@ -2124,13 +2184,13 @@ async function saveVideo(){
     var url=sanR(($('av-url')||{value:''}).value);
     var ytId=extractYtId(url);
     if(!ytId){toast('Invalid YouTube URL','err');return;}
-    if(ST.videos.find(function(v){return v.ytId===ytId;})){toast('Video already added!','err');return;}
+    if(ST.videos.find(function(v){return v.ytId===ytId;})){toast('Video already added!','err');restoreSaveBtn();return;}
     var quiz1=sanR(($('av-quiz')||{value:''}).value).trim();
     var quiz2v=sanR(($('av-quiz2')||{value:''}).value).trim();
     var splash=sanR(($('av-splash')||{value:''}).value).trim();
     var newVidData={ytId,title,topic,channel,course,subj,notesLink:notes,quizLink:quiz1,quiz2:quiz2v,splashImg:splash,dur:3600,tid:ST.user.id,seq:ST.videos.length,tags:[topic,subj,channel].filter(Boolean),desc:topic};
     var newId=await fsAdd('videos',newVidData);
-    if(!newId){toast('Failed to add video — is Firebase configured?','err');return;}
+    if(!newId){toast('Failed to add video — check Firebase setup in Admin Settings','err');restoreSaveBtn();return;}
     // Notify interested students
     try{ notifyInterestedStudents(Object.assign({id:newId},newVidData)); }catch(e){}
     toast('"'+title+'" added! All students see it now.');
@@ -3356,13 +3416,13 @@ function _applyConfigAndDownload(pageHTML, apiKey, authDomain, projectId, appId,
   function rp(src, placeholder, value){
     return src.split(placeholder).join(value);
   }
-  pageHTML = rp(pageHTML, "var _HC_API_KEY      = 'AIzaSyCQ3s1E1Kb9DbZrQTcMkKBSvzyLxieM7cQ'; // configured",     "var _HC_API_KEY      = '" + apiKey     + "'; // configured");
-  pageHTML = rp(pageHTML, "var _HC_AUTH_DOMAIN  = 'kaveer-6f771.firebaseapp.com'; // configured", "var _HC_AUTH_DOMAIN  = '" + authDomain + "'; // configured");
-  pageHTML = rp(pageHTML, "var _HC_PROJECT_ID   = 'kaveer-6f771'; // configured",  "var _HC_PROJECT_ID   = '" + projectId  + "'; // configured");
-  pageHTML = rp(pageHTML, "var _HC_APP_ID       = '1:421590906831:web:f2cac514884b6d1b64c4ba'; // configured",      "var _HC_APP_ID       = '" + appId      + "'; // configured");
-  pageHTML = rp(pageHTML, "var _HC_BREVO_KEY    = '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'; // configured",   "var _HC_BREVO_KEY    = '" + brevoKey   + "'; // configured");
-  pageHTML = rp(pageHTML, "var _HC_BREVO_FROM   = 'kaveer.platform@gmail.com'; // configured",  "var _HC_BREVO_FROM   = '" + brevoFrom  + "'; // configured");
-  pageHTML = rp(pageHTML, "var _HC_BREVO_NAME   = 'KAVEER'; // configured",  "var _HC_BREVO_NAME   = '" + (brevoName||'KAVEER') + "'; // configured");
+  pageHTML = rp(pageHTML, "var _HC_API_KEY      = ''; // KAVEER_PLACEHOLDER_APIKEY",     "var _HC_API_KEY      = '" + apiKey     + "'; // configured");
+  pageHTML = rp(pageHTML, "var _HC_AUTH_DOMAIN  = ''; // KAVEER_PLACEHOLDER_AUTHDOMAIN", "var _HC_AUTH_DOMAIN  = '" + authDomain + "'; // configured");
+  pageHTML = rp(pageHTML, "var _HC_PROJECT_ID   = ''; // KAVEER_PLACEHOLDER_PROJECTID",  "var _HC_PROJECT_ID   = '" + projectId  + "'; // configured");
+  pageHTML = rp(pageHTML, "var _HC_APP_ID       = ''; // KAVEER_PLACEHOLDER_APPID",      "var _HC_APP_ID       = '" + appId      + "'; // configured");
+  pageHTML = rp(pageHTML, "var _HC_BREVO_KEY    = ''; // KAVEER_PLACEHOLDER_BREVOKEY",   "var _HC_BREVO_KEY    = '" + brevoKey   + "'; // configured");
+  pageHTML = rp(pageHTML, "var _HC_BREVO_FROM   = ''; // KAVEER_PLACEHOLDER_BREVOFROM",  "var _HC_BREVO_FROM   = '" + brevoFrom  + "'; // configured");
+  pageHTML = rp(pageHTML, "var _HC_BREVO_NAME   = ''; // KAVEER_PLACEHOLDER_BREVONAME",  "var _HC_BREVO_NAME   = '" + (brevoName||'KAVEER') + "'; // configured");
   var blob = new Blob([pageHTML], {type:'text/html;charset=utf-8;'});
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');
@@ -3380,6 +3440,7 @@ async function saveGlobalSplash(){
   toast(url ? '✅ Splash screen saved! All students see it before every video.' : 'Splash screen removed.');
   showAdmSec('settings', null); // refresh to show preview
 }
+
 
 </script>
 </body>
