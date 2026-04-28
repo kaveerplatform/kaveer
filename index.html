@@ -259,8 +259,8 @@ textarea.fi{resize:vertical;min-height:80px}
 <div id="toast"></div>
 
 <!-- ══ LANDING ══════════════════════════════════════════════ -->
-<div id="s-landing" class="screen on" style="background:#0d0d14;min-height:100vh;">
-  <div id="landing-page"><div style="padding:40px;text-align:center;color:#00c9a7;font-family:sans-serif"><h1 style="font-size:36px;font-weight:800;margin-bottom:10px">KAVEER</h1><p style="color:#888;margin-bottom:20px">Loading...</p><div style="width:40px;height:40px;border:3px solid rgba(0,201,167,.3);border-top-color:#00c9a7;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto"></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style></div></div>
+<div id="s-landing" class="screen on">
+  <div id="landing-page"></div>
 </div>
 
 <!-- ══ LOGIN ════════════════════════════════════════════════ -->
@@ -547,7 +547,6 @@ textarea.fi{resize:vertical;min-height:80px}
 
 </body>
 <script>
-
 // ═══════════════════════════════════════════════════════════════
 // KAVEER v8 — Complete Core Rewrite
 // Everything from Firestore. No localStorage for config.
@@ -745,10 +744,7 @@ async function saveAllSettings(){
     ST.settings.shareMsg = shareMsg; ST.settings.globalSplash = splash;
     KAVEER_PROJECT_ID = projectId;
     if(admNewU && admNewP && admNewP.length>=8){ window._admUser=admNewU; window._admPass=admNewP; }
-    toast('✅ All settings saved! Now click "Bake & Download" below.','ok');
-    // Make sure bake section is visible
-    var bs = document.getElementById('bake-section');
-    if(bs) bs.style.display='block';
+    toast('✅ All settings saved! Now click "Bake & Download" once — then upload to GitHub.','ok');
     if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='Save All Settings'; }
     // Show the bake button prominently
     var bakeSection = document.getElementById('bake-section');
@@ -762,27 +758,23 @@ async function saveAllSettings(){
 // ── Bake project ID into file and download ────────────────────
 // This is the ONLY download ever needed — just the project ID
 function bakeAndDownload(){
-  // Use project ID from form if not yet set in memory
-  var pid = KAVEER_PROJECT_ID || (document.getElementById('fb-projectid')||{value:''}).value.trim();
-  if(!pid){
-    toast('Enter your Firebase Project ID first, then Save All Settings','err');
-    return;
+  if(!KAVEER_PROJECT_ID){
+    toast('Save settings first','err'); return;
   }
   toast('Fetching source file...','inf');
   fetch(window.location.href.split('?')[0], {cache:'no-store'})
     .then(function(r){ return r.text(); })
     .then(function(src){
-      var pid = KAVEER_PROJECT_ID || (document.getElementById('fb-projectid')||{value:''}).value.trim();
-      // Replace the project ID placeholder with real value
+      // Replace the empty project ID with the real one
       var updated = src.replace(
         "var KAVEER_PROJECT_ID = ''; // SET BY ADMIN — see Admin → Settings → Save & Bake",
-        "var KAVEER_PROJECT_ID = '"+pid+"'; // configured"
+        "var KAVEER_PROJECT_ID = '"+KAVEER_PROJECT_ID+"'; // configured"
       );
       if(updated === src){
-        // Already has a project ID - update it
+        // Already has a project ID - just update it
         updated = src.replace(
           /var KAVEER_PROJECT_ID = '[^']*';/,
-          "var KAVEER_PROJECT_ID = '"+pid+"';"
+          "var KAVEER_PROJECT_ID = '"+KAVEER_PROJECT_ID+"';"
         );
       }
       var blob = new Blob([updated],{type:'text/html;charset=utf-8;'});
@@ -811,9 +803,12 @@ function admSet(){
     +'<p style="font-size:13px;color:var(--wh);margin-bottom:12px;font-weight:600">Fill all fields below → click <strong style="color:var(--tl)">Save All Settings</strong> → they save to Firebase cloud instantly.</p>'
     +'<div style="display:flex;gap:9px;flex-wrap:wrap">'
       +'<button id="save-all-btn" class="btn btn-t" onclick="saveAllSettings()" style="font-size:15px;padding:12px 28px">💾 Save All Settings</button>'
-      +'<button class="btn btn-g" onclick="bakeAndDownload()" style="font-size:14px;padding:12px 20px">⬇ Bake & Download index.html</button>'
+      +'<div id="bake-section" style="'+(hasPid?'':'display:none')+'">'
+        +'<button class="btn btn-g" onclick="bakeAndDownload()" style="font-size:14px;padding:12px 20px">⬇ Bake & Download index.html</button>'
+        +'<div style="font-size:11px;color:var(--mu);margin-top:4px">Upload to GitHub once → works everywhere forever</div>'
+      +'</div>'
     +'</div>'
-    +'<div style="margin-top:10px;font-size:11px;color:var(--mu)">Step 1: Fill fields + Save All → Step 2: Bake & Download → Step 3: Upload index.html to GitHub once'+(KAVEER_PROJECT_ID?'<br><span style="color:var(--tl)">✓ Project ID set: <code>'+KAVEER_PROJECT_ID+'</code></span>':'')+'</div>'
+    +(hasPid?'<div style="margin-top:10px;font-size:12px;color:var(--tl)">✓ Project ID baked: <code>'+KAVEER_PROJECT_ID+'</code></div>':'<div style="margin-top:10px;font-size:11px;color:var(--mu)">After saving Firebase config → bake it into the file → upload once to GitHub</div>')
   +'</div>'
 
   // ── Firebase ──
@@ -3556,7 +3551,6 @@ async function notifyInterestedStudents(video){
 // ── Download Configured Site ──────────────────────────────────
 // This bakes Firebase config INTO the HTML file.
 // Upload the downloaded file to GitHub → works on ALL devices.
-
 
 
 
